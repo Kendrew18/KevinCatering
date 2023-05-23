@@ -49,7 +49,7 @@ func Sign_up(nama_user string, telp_user string, email_user string,
 
 	_ = con.QueryRow(sqlStatement, username_user).Scan(&arr.Id_user)
 
-	if arr.Id_user != "" {
+	if arr.Id_user == "" {
 
 		nm := Generate_Id_User()
 

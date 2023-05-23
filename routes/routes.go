@@ -22,6 +22,7 @@ func Init() *echo.Echo {
 	PA := e.Group("/PA")
 	ORD := e.Group("/ORD")
 	PBR := e.Group("/PBR")
+	MP := e.Group("/MP")
 
 	//user
 	//Sign_UP
@@ -77,6 +78,11 @@ func Init() *echo.Echo {
 	//foto
 	//get image foto
 	PBR.GET("/read-foto", controllers.ReadFoto)
+
+	//MAPS
+	MP.POST("/input-maps", controllers.InputMaps)
+
+	MP.GET("/read-maps", controllers.ReadMaps)
 
 	//Rating
 

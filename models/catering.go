@@ -47,7 +47,7 @@ func Input_Catering(id_user string, nama_catering string, alamat_catering string
 
 	id_ct := "CT-" + nm_str
 
-	sqlStatement := "INSERT INTO catering (id_catering,id_user, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan_catering, foto_profil_catering,rating) values(?,?,?,?,?,?,?,?,?,?)"
+	sqlStatement := "INSERT INTO catering (id_catering, id_user, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan_catering, foto_profil_catering, rating) values(?,?,?,?,?,?,?,?,?,?)"
 
 	stmt, err := con.Prepare(sqlStatement)
 

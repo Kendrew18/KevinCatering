@@ -27,9 +27,9 @@ func InputCatering(c echo.Context) error {
 
 //Read_Profile_Catering
 func ReadProfileCatering(c echo.Context) error {
-	id_catering := c.FormValue("id_catering")
+	id_user := c.FormValue("id_user")
 
-	result, err := models.Read_Profile_Catering(id_catering)
+	result, err := models.Read_Profile_Catering(id_user)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

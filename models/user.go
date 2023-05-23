@@ -41,28 +41,40 @@ func Sign_up(nama_user string, telp_user string, email_user string,
 	status_user int) (tools.Response, error) {
 	var res tools.Response
 
+	var arr str.Login
+
 	con := db.CreateCon()
 
-	nm := Generate_Id_User()
+	sqlStatement := "SELECT id_user FROM user where username_user=?"
 
-	nm_str := strconv.Itoa(nm)
+	_ = con.QueryRow(sqlStatement, username_user).Scan(&arr.Id_user)
 
-	id_US := "US-" + nm_str
+	if arr.Id_user != "" {
 
-	sqlStatement := "INSERT INTO user (id_user,nama,telp_user,email_user,username_user,password_user,foto_user,status_user) values(?,?,?,?,?,?,?,?)"
+		nm := Generate_Id_User()
 
-	stmt, err := con.Prepare(sqlStatement)
+		nm_str := strconv.Itoa(nm)
 
-	if err != nil {
-		return res, err
+		id_US := "US-" + nm_str
+
+		sqlStatement = "INSERT INTO user (id_user,nama,telp_user,email_user,username_user,password_user,foto_user,status_user) values(?,?,?,?,?,?,?,?)"
+
+		stmt, err := con.Prepare(sqlStatement)
+
+		if err != nil {
+			return res, err
+		}
+
+		_, err = stmt.Exec(id_US, nama_user, telp_user, email_user, username_user, password_user, "uploads/images.png", status_user)
+
+		stmt.Close()
+
+		res.Status = http.StatusOK
+		res.Message = "Sukses"
+	} else {
+		res.Status = http.StatusNotFound
+		res.Message = "Status Not Found"
 	}
-
-	_, err = stmt.Exec(id_US, nama_user, telp_user, email_user, username_user, password_user, "uploads/images.png", status_user)
-
-	stmt.Close()
-
-	res.Status = http.StatusOK
-	res.Message = "Sukses"
 
 	return res, nil
 }

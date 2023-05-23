@@ -88,7 +88,7 @@ func Read_Profile_Catering(id_user string) (tools.Response, error) {
 	for rows.Next() {
 		err = rows.Scan(&obj.Id_catering, &obj.Nama_catering, &obj.Alamat_catering,
 			&obj.Telp_catering, &obj.Email_catering, &obj.Deskripsi_catering,
-			&obj_c, &obj.Foto_profil_catering, &obj.Rating)
+			&obj_c.Tipe_catering, &obj.Foto_profil_catering, &obj.Rating)
 		obj.Tipe_pemesanan = tools.String_Separator_To_String(obj_c.Tipe_catering)
 		if err != nil {
 			return res, err

@@ -196,13 +196,12 @@ func Read_Awal_Catering() (tools.Response, error) {
 
 //edit profile
 func Edit_Profile_Catering(id_catering string, nama_catering string, alamat_catering string,
-	telp_catering string, email_catering string, deskripsi_catering string,
-	tipe_pemesanan_catering string) (tools.Response, error) {
+	telp_catering string, email_catering string, deskripsi_catering string) (tools.Response, error) {
 	var res tools.Response
 
 	con := db.CreateCon()
 
-	sqlstatement := "UPDATE catering SET nama_catering=?,alamat_catering=?,telp_catering=?,email_catering=?,deskripsi_catering=?,tipe_pemesanan_catering=? WHERE id_catering=?"
+	sqlstatement := "UPDATE catering SET nama_catering=?,alamat_catering=?,telp_catering=?,email_catering=?,deskripsi_catering=? WHERE id_catering=?"
 
 	stmt, err := con.Prepare(sqlstatement)
 
@@ -210,7 +209,7 @@ func Edit_Profile_Catering(id_catering string, nama_catering string, alamat_cate
 		return res, err
 	}
 
-	result, err := stmt.Exec(nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan_catering, id_catering)
+	result, err := stmt.Exec(nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, id_catering)
 
 	if err != nil {
 		return res, err

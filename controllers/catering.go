@@ -70,9 +70,8 @@ func EditProfileCatering(c echo.Context) error {
 	telp_catering := c.FormValue("telp_catering")
 	email_catering := c.FormValue("email_catering")
 	deskripsi_catering := c.FormValue("deskripsi_catering")
-	tipe_pemesanan := c.FormValue("tipe_pemesanan")
 
-	result, err := models.Edit_Profile_Catering(id_catering, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan)
+	result, err := models.Edit_Profile_Catering(id_catering, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

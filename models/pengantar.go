@@ -118,3 +118,58 @@ func Read_Pengantar(id_catering string) (tools.Response, error) {
 
 	return res, nil
 }
+
+func Update_Maps(id_user string, langtitude float64, longtitude float64) (tools.Response, error) {
+	var res tools.Response
+
+	con := db.CreateCon()
+
+	sqlstatement := "UPDATE pengantar SET longtitude=?,langtitude=? WHERE id_user=?"
+
+	stmt, err := con.Prepare(sqlstatement)
+
+	if err != nil {
+		return res, err
+	}
+
+	_, err = stmt.Exec(longtitude, langtitude, id_user)
+
+	if err != nil {
+		return res, err
+	}
+
+	res.Status = http.StatusOK
+	res.Message = "Suksess"
+
+	return res, nil
+}
+
+func Read_Maps_Pengantar(Id_catering string) (tools.Response, error) {
+	var res tools.Response
+	var maps str.Read_Maps_Pengantar
+	var maps_arr []str.Read_Maps_Pengantar
+
+	con := db.CreateCon()
+
+	sqlstatement := "SELECT longtitude, langtitude FROM maps WHERE id_catering=?"
+
+	err := con.QueryRow(sqlstatement, Id_catering).Scan(&maps.Longtitude, &maps.Langtitude)
+
+	if err != nil {
+		return res, err
+	}
+
+	maps_arr = append(maps_arr, maps)
+
+	if maps_arr == nil {
+		res.Status = http.StatusNotFound
+		res.Message = "Not Found"
+		res.Data = maps_arr
+	} else {
+		res.Status = http.StatusOK
+		res.Message = "Sukses"
+		res.Data = maps_arr
+	}
+
+	return res, nil
+}

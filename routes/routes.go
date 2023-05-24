@@ -60,6 +60,10 @@ func Init() *echo.Echo {
 	PA.POST("/su-pengantar", controllers.SignUpPengantar)
 	//Read-Pengantar
 	PA.GET("/read-pengantar", controllers.ReadPengantar)
+	//Update-Maps-Pengantar
+	PA.PUT("/update-maps-pengantar", controllers.UpdateMaps)
+	//Read-Maps-Pengantar
+	PA.PUT("/read-maps-pengantar", controllers.ReadMapsPengantar)
 
 	//Order
 	//input

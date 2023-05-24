@@ -39,3 +39,32 @@ func ReadPengantar(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, result)
 }
+
+func UpdateMaps(c echo.Context) error {
+	id_user := c.FormValue("id_user")
+	langtitude := c.FormValue("langtitude")
+	longtitude := c.FormValue("longtitude")
+
+	long, _ := strconv.ParseFloat(longtitude, 64)
+	lang, _ := strconv.ParseFloat(langtitude, 64)
+
+	result, err := models.Update_Maps(id_user, lang, long)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+func ReadMapsPengantar(c echo.Context) error {
+	id_user := c.FormValue("id_user")
+
+	result, err := models.Read_Maps_Pengantar(id_user)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}

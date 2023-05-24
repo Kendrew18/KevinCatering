@@ -110,7 +110,7 @@ func Read_Profile_Catering(id_user string) (tools.Response, error) {
 }
 
 //see_catering
-func Read_Catering() (tools.Response, error) {
+func Read_Catering(id_catering string) (tools.Response, error) {
 	var res tools.Response
 	var arr []str.Read_Catering
 	var obj str.Read_Catering
@@ -118,9 +118,9 @@ func Read_Catering() (tools.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_catering, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan_catering, foto_profil_catering,rating FROM catering "
+	sqlStatement := "SELECT id_catering, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan_catering, foto_profil_catering,rating FROM catering WHERE id_catering=?"
 
-	rows, err := con.Query(sqlStatement)
+	rows, err := con.Query(sqlStatement, id_catering)
 
 	defer rows.Close()
 

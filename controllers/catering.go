@@ -40,8 +40,9 @@ func ReadProfileCatering(c echo.Context) error {
 
 //Read_Catering
 func ReadCatering(c echo.Context) error {
+	id_catering := c.FormValue("id-catering")
 
-	result, err := models.Read_Catering()
+	result, err := models.Read_Catering(id_catering)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

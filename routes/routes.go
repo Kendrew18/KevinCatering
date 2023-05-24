@@ -63,7 +63,7 @@ func Init() *echo.Echo {
 	//Update-Maps-Pengantar
 	PA.PUT("/update-maps-pengantar", controllers.UpdateMaps)
 	//Read-Maps-Pengantar
-	PA.PUT("/read-maps-pengantar", controllers.ReadMapsPengantar)
+	PA.GET("/read-maps-pengantar", controllers.ReadMapsPengantar)
 
 	//Order
 	//input

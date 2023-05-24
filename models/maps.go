@@ -78,7 +78,7 @@ func Input_Maps(Id_catering string, longtitude float64, langtitude float64, radi
 			return res, err
 		}
 
-		_, err = stmt.Exec(longtitude, langtitude, radius)
+		_, err = stmt.Exec(longtitude, langtitude, radius, Id_catering)
 
 		if err != nil {
 			return res, err

@@ -53,7 +53,7 @@ func Init() *echo.Echo {
 	//Edit_menu
 	mn.PUT("/update-menu", controllers.EditMenu)
 	//Delete_menu
-	mn.PUT("/Delete_Menu", controllers.DeleteMenu)
+	mn.DELETE("/Delete_Menu", controllers.DeleteMenu)
 
 	//Pengantar
 	//Sign-UP-Penganta

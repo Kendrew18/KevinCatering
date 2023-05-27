@@ -133,7 +133,7 @@ func Read_Menu(id_catering string, tanggal_menu string) (tools.Response, error) 
 
 	err := con.QueryRow(sqlStatement, date_sql, id_catering).Scan(&rm.Id_catering, &rm.Tanggal_menu,
 		&menu.Id_menu, &menu.Nama_menu, &menu.Harga_menu, &menu.Jam_pengiriman_awal,
-		&menu.Jam_pengiriman_akhir, &menu.Status_menu)
+		&menu.Jam_pengiriman_akhir, &menu.Status_menu, &menu.Foto_menu)
 
 	if err != nil {
 		return res, err

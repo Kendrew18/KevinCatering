@@ -4,8 +4,12 @@ import (
 	"KevinCatering/db"
 	str "KevinCatering/struct"
 	"KevinCatering/tools"
+	"fmt"
+	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -358,9 +362,10 @@ func Delete_Menu(id_catering string, id_menu string, tanggal_menu string) (tools
 	return res, nil
 }
 
-/*
 func Upload_Foto_Menu(id_catering string, id_menu string, tanggal_menu string, writer http.ResponseWriter, request *http.Request) (tools.Response, error) {
 	var res tools.Response
+	var fotm str.Foto_Menu
+	var fotfx str.Foto_Menu_Fix
 
 	con := db.CreateCon()
 
@@ -373,78 +378,163 @@ func Upload_Foto_Menu(id_catering string, id_menu string, tanggal_menu string, w
 
 	defer file.Close()
 
-	if() {
+	date, _ := time.Parse("02-01-2006", tanggal_menu)
+	date_sql := date.Format("2006-01-02")
 
-		fmt.Println("File Info")
-		fmt.Println("File Name : ", handler.Filename)
-		fmt.Println("File Size : ", handler.Size)
-		fmt.Println("File Type : ", handler.Header.Get("Content-Type"))
+	sqlStatement := "SELECT id_menu, foto_menu FROM menu WHERE tanggal_menu=? && id_catering=? "
 
-		var tempFile *os.File
-		path := ""
+	err = con.QueryRow(sqlStatement, date_sql, id_catering).Scan(&fotm.Id_menu, &fotm.Path_Foto)
 
-		if strings.Contains(handler.Filename, "jpg") {
-			path = "uploads/" + id_menu + ".jpg"
-			tempFile, err = ioutil.TempFile("uploads/", "Read"+"*.jpg")
-		}
-		if strings.Contains(handler.Filename, "jpeg") {
-			path = "uploads/" + id_menu + ".jpeg"
-			tempFile, err = ioutil.TempFile("uploads/", "Read"+"*.jpeg")
-		}
-		if strings.Contains(handler.Filename, "png") {
-			path = "uploads/" + id_menu + ".png"
-			tempFile, err = ioutil.TempFile("uploads/", "Read"+"*.png")
-		}
-
-		if err != nil {
-			return res, err
-		}
-
-		fileBytes, err2 := ioutil.ReadAll(file)
-		if err2 != nil {
-			return res, err2
-		}
-
-		_, err = tempFile.Write(fileBytes)
-		if err != nil {
-			return res, err
-		}
-
-		fmt.Println("Success!!")
-		fmt.Println(tempFile.Name())
-		tempFile.Close()
-
-		err = os.Rename(tempFile.Name(), path)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		defer tempFile.Close()
-
-		fmt.Println("new path:", tempFile.Name())
-
-		sqlstatement := "UPDATE pembayaran SET bukti_pembayaran=? WHERE id_order=?"
-
-		stmt, err := con.Prepare(sqlstatement)
-
-		if err != nil {
-			return res, err
-		}
-
-		result, err := stmt.Exec(path)
-
-		if err != nil {
-			return res, err
-		}
-
-		_, err = result.RowsAffected()
-
-		if err != nil {
-			return res, err
-		}
-
-		res.Status = http.StatusOK
-		res.Message = "Sukses"
+	if err != nil {
+		return res, err
 	}
+
+	fotfx.Id_menu = tools.String_Separator_To_String(fotm.Id_menu)
+	fotfx.Path_Foto = tools.String_Separator_To_String(fotm.Path_Foto)
+
+	tp1 := ""
+
+	tp2 := ""
+
+	for i := 0; i < len(fotfx.Path_Foto); i++ {
+		if fotfx.Id_menu[i] == id_menu {
+			if fotfx.Path_Foto[i] == "photo_menu/photo.jpg" {
+
+				fmt.Println("File Info")
+				fmt.Println("File Name : ", handler.Filename)
+				fmt.Println("File Size : ", handler.Size)
+				fmt.Println("File Type : ", handler.Header.Get("Content-Type"))
+
+				var tempFile *os.File
+				path := ""
+
+				if strings.Contains(handler.Filename, "jpg") {
+					path = "photo_menu/" + id_menu + ".jpg"
+					tempFile, err = ioutil.TempFile("photo_menu/", "Read"+"*.jpg")
+				}
+				if strings.Contains(handler.Filename, "jpeg") {
+					path = "photo_menu/" + id_menu + ".jpeg"
+					tempFile, err = ioutil.TempFile("photo_menu/", "Read"+"*.jpeg")
+				}
+				if strings.Contains(handler.Filename, "png") {
+					path = "photo_menu/" + id_menu + ".png"
+					tempFile, err = ioutil.TempFile("photo_menu/", "Read"+"*.png")
+				}
+
+				if err != nil {
+					return res, err
+				}
+
+				fileBytes, err2 := ioutil.ReadAll(file)
+				if err2 != nil {
+					return res, err2
+				}
+
+				_, err = tempFile.Write(fileBytes)
+				if err != nil {
+					return res, err
+				}
+
+				fmt.Println("Success!!")
+				fmt.Println(tempFile.Name())
+				tempFile.Close()
+
+				err = os.Rename(tempFile.Name(), path)
+				if err != nil {
+					fmt.Println(err)
+				}
+
+				defer tempFile.Close()
+
+				fmt.Println("new path:", tempFile.Name())
+
+				tp1 = tp1 + "|" + fotfx.Id_menu[i] + "|"
+				tp2 = tp2 + "|" + path + "|"
+
+			} else {
+				_ = os.Remove("./" + fotfx.Path_Foto[i])
+
+				fmt.Println("File Info")
+				fmt.Println("File Name : ", handler.Filename)
+				fmt.Println("File Size : ", handler.Size)
+				fmt.Println("File Type : ", handler.Header.Get("Content-Type"))
+
+				var tempFile *os.File
+				path := ""
+
+				if strings.Contains(handler.Filename, "jpg") {
+					path = "photo_menu/" + id_menu + ".jpg"
+					tempFile, err = ioutil.TempFile("photo_menu/", "Read"+"*.jpg")
+				}
+				if strings.Contains(handler.Filename, "jpeg") {
+					path = "photo_menu/" + id_menu + ".jpeg"
+					tempFile, err = ioutil.TempFile("photo_menu/", "Read"+"*.jpeg")
+				}
+				if strings.Contains(handler.Filename, "png") {
+					path = "photo_menu/" + id_menu + ".png"
+					tempFile, err = ioutil.TempFile("photo_menu/", "Read"+"*.png")
+				}
+
+				if err != nil {
+					return res, err
+				}
+
+				fileBytes, err2 := ioutil.ReadAll(file)
+				if err2 != nil {
+					return res, err2
+				}
+
+				_, err = tempFile.Write(fileBytes)
+				if err != nil {
+					return res, err
+				}
+
+				fmt.Println("Success!!")
+				fmt.Println(tempFile.Name())
+				tempFile.Close()
+
+				err = os.Rename(tempFile.Name(), path)
+				if err != nil {
+					fmt.Println(err)
+				}
+
+				defer tempFile.Close()
+
+				fmt.Println("new path:", tempFile.Name())
+
+				tp1 = tp1 + "|" + fotfx.Id_menu[i] + "|"
+				tp2 = tp2 + "|" + path + "|"
+			}
+
+		} else {
+			tp1 = tp1 + "|" + fotfx.Id_menu[i] + "|"
+			tp2 = tp2 + "|" + fotfx.Path_Foto[i] + "|"
+		}
+
+	}
+
+	sqlstatement := "UPDATE menu SET id_menu=?,foto_menu=? WHERE id_catering=? && tanggal_menu=?"
+
+	stmt, err := con.Prepare(sqlstatement)
+
+	if err != nil {
+		return res, err
+	}
+
+	result, err := stmt.Exec(tp1, tp2, id_catering, date_sql)
+
+	if err != nil {
+		return res, err
+	}
+
+	_, err = result.RowsAffected()
+
+	if err != nil {
+		return res, err
+	}
+
+	res.Status = http.StatusOK
+	res.Message = "Sukses"
+
 	return res, nil
-}*/
+}

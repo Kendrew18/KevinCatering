@@ -54,6 +54,8 @@ func Init() *echo.Echo {
 	mn.PUT("/update-menu", controllers.EditMenu)
 	//Delete_menu
 	mn.DELETE("/Delete_Menu", controllers.DeleteMenu)
+	//upload_foto_menu
+	mn.POST("/upload-foto-menu", controllers.UploadFotoMenu)
 
 	//Pengantar
 	//Sign-UP-Penganta

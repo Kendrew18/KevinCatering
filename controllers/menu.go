@@ -72,3 +72,19 @@ func DeleteMenu(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, result)
 }
+
+//upload_foto_menu
+
+func UploadFotoMenu(c echo.Context) error {
+	id_catering := c.FormValue("id_catering")
+	id_menu := c.FormValue("id_menu")
+	tanggal_menu := c.FormValue("tanggal_menu")
+
+	result, err := models.Upload_Foto_Menu(id_catering, id_menu, tanggal_menu, c.Response(), c.Request())
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}

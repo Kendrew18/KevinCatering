@@ -82,9 +82,13 @@ func Input_Menu(id_catering string, nama_menu string, harga_menu string, tanggal
 
 		sqlStatement := "SELECT id_menu, nama_menu, harga_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu, foto_menu FROM menu WHERE tanggal_menu=? && id_catering=? "
 
-		_ = con.QueryRow(sqlStatement, date_sql, id_catering).Scan(&menu.Id_menu,
+		err := con.QueryRow(sqlStatement, date_sql, id_catering).Scan(&menu.Id_menu,
 			&menu.Nama_menu, &menu.Harga_menu, &menu.Jam_pengiriman_awal,
 			&menu.Jam_pengiriman_akhir, &menu.Status_menu, &menu.Foto_menu)
+
+		if err != nil {
+			return res, err
+		}
 
 		id_mn_all := menu.Id_menu + "|" + id_MN + "|"
 		nm_mn := menu.Nama_menu + "|" + nama_menu + "|"
@@ -102,7 +106,7 @@ func Input_Menu(id_catering string, nama_menu string, harga_menu string, tanggal
 			return res, err
 		}
 
-		_, err = stmt.Exec(id_mn_all, nm_mn, hg_mn, j_awal, j_akhir, st, id_catering, date_sql, fm)
+		_, err = stmt.Exec(id_mn_all, nm_mn, hg_mn, j_awal, j_akhir, st, fm, id_catering, date_sql)
 
 		if err != nil {
 			return res, err

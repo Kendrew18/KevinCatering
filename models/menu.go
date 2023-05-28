@@ -72,7 +72,7 @@ func Input_Menu(id_catering string, nama_menu string, harga_menu string, tanggal
 		}
 
 		_, err = stmt.Exec(id_catering, id_mn_all, nm_mn, hg_mn, date_sql, j_awal,
-			j_akhir, st, "|uploads/images.png|")
+			j_akhir, st, "|photo_menu/photo.jpg|")
 
 		stmt.Close()
 
@@ -84,7 +84,7 @@ func Input_Menu(id_catering string, nama_menu string, harga_menu string, tanggal
 
 		_ = con.QueryRow(sqlStatement, date_sql, id_catering).Scan(&menu.Id_menu,
 			&menu.Nama_menu, &menu.Harga_menu, &menu.Jam_pengiriman_awal,
-			&menu.Jam_pengiriman_akhir, &menu.Status_menu)
+			&menu.Jam_pengiriman_akhir, &menu.Status_menu, &menu.Foto_menu)
 
 		id_mn_all := menu.Id_menu + "|" + id_MN + "|"
 		nm_mn := menu.Nama_menu + "|" + nama_menu + "|"
@@ -92,8 +92,9 @@ func Input_Menu(id_catering string, nama_menu string, harga_menu string, tanggal
 		j_awal := menu.Jam_pengiriman_awal + "|" + jam_pengiriman_awal + "|"
 		j_akhir := menu.Jam_pengiriman_akhir + "|" + jam_pengiriman_akhir + "|"
 		st := menu.Status_menu + "|" + status + "|"
+		fm := menu.Foto_menu + "|photo_menu/photo.jpg|"
 
-		sqlstatement := "UPDATE menu SET id_menu=?,nama_menu=?,harga_menu=?,jam_pengiriman_awal=?,jam_pengiriman_akhir=?,status_menu=? WHERE id_catering=? && tanggal_menu=?"
+		sqlstatement := "UPDATE menu SET id_menu=?,nama_menu=?,harga_menu=?,jam_pengiriman_awal=?,jam_pengiriman_akhir=?,status_menu=?,foto_menu=? WHERE id_catering=? && tanggal_menu=?"
 
 		stmt, err := con.Prepare(sqlstatement)
 
@@ -101,7 +102,7 @@ func Input_Menu(id_catering string, nama_menu string, harga_menu string, tanggal
 			return res, err
 		}
 
-		_, err = stmt.Exec(id_mn_all, nm_mn, hg_mn, j_awal, j_akhir, st, id_catering, date_sql)
+		_, err = stmt.Exec(id_mn_all, nm_mn, hg_mn, j_awal, j_akhir, st, id_catering, date_sql, fm)
 
 		if err != nil {
 			return res, err
@@ -145,6 +146,7 @@ func Read_Menu(id_catering string, tanggal_menu string) (tools.Response, error) 
 	j_awal := tools.String_Separator_To_String(menu.Jam_pengiriman_awal)
 	j_akhir := tools.String_Separator_To_String(menu.Jam_pengiriman_akhir)
 	st := tools.String_Separator_To_Int(menu.Status_menu)
+	fm := tools.String_Separator_To_String(menu.Foto_menu)
 
 	for i := 0; i < len(id_mn_all); i++ {
 		obj.Id_menu = id_mn_all[i]
@@ -153,6 +155,7 @@ func Read_Menu(id_catering string, tanggal_menu string) (tools.Response, error) 
 		obj.Jam_pengiriman_awal = j_awal[i]
 		obj.Jam_pengiriman_akhir = j_akhir[i]
 		obj.Status_menu = st[i]
+		obj.Foto_menu = fm[i]
 		rm.Menu = append(rm.Menu, obj)
 	}
 	arr = append(arr, rm)
@@ -350,3 +353,94 @@ func Delete_Menu(id_catering string, id_menu string, tanggal_menu string) (tools
 	}
 	return res, nil
 }
+
+/*
+func Upload_Foto_Menu(id_catering string, id_menu string, tanggal_menu string, writer http.ResponseWriter, request *http.Request) (tools.Response, error) {
+	var res tools.Response
+
+	con := db.CreateCon()
+
+	request.ParseMultipartForm(10 * 1024 * 1024)
+	file, handler, err := request.FormFile("photo")
+	if err != nil {
+		fmt.Println(err)
+		return res, err
+	}
+
+	defer file.Close()
+
+	if() {
+
+		fmt.Println("File Info")
+		fmt.Println("File Name : ", handler.Filename)
+		fmt.Println("File Size : ", handler.Size)
+		fmt.Println("File Type : ", handler.Header.Get("Content-Type"))
+
+		var tempFile *os.File
+		path := ""
+
+		if strings.Contains(handler.Filename, "jpg") {
+			path = "uploads/" + id_menu + ".jpg"
+			tempFile, err = ioutil.TempFile("uploads/", "Read"+"*.jpg")
+		}
+		if strings.Contains(handler.Filename, "jpeg") {
+			path = "uploads/" + id_menu + ".jpeg"
+			tempFile, err = ioutil.TempFile("uploads/", "Read"+"*.jpeg")
+		}
+		if strings.Contains(handler.Filename, "png") {
+			path = "uploads/" + id_menu + ".png"
+			tempFile, err = ioutil.TempFile("uploads/", "Read"+"*.png")
+		}
+
+		if err != nil {
+			return res, err
+		}
+
+		fileBytes, err2 := ioutil.ReadAll(file)
+		if err2 != nil {
+			return res, err2
+		}
+
+		_, err = tempFile.Write(fileBytes)
+		if err != nil {
+			return res, err
+		}
+
+		fmt.Println("Success!!")
+		fmt.Println(tempFile.Name())
+		tempFile.Close()
+
+		err = os.Rename(tempFile.Name(), path)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		defer tempFile.Close()
+
+		fmt.Println("new path:", tempFile.Name())
+
+		sqlstatement := "UPDATE pembayaran SET bukti_pembayaran=? WHERE id_order=?"
+
+		stmt, err := con.Prepare(sqlstatement)
+
+		if err != nil {
+			return res, err
+		}
+
+		result, err := stmt.Exec(path)
+
+		if err != nil {
+			return res, err
+		}
+
+		_, err = result.RowsAffected()
+
+		if err != nil {
+			return res, err
+		}
+
+		res.Status = http.StatusOK
+		res.Message = "Sukses"
+	}
+	return res, nil
+}*/

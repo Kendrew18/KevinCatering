@@ -197,7 +197,7 @@ func Edit_Menu(id_catering string, id_menu string, nama_menu string, harga_menu 
 	date, _ := time.Parse("02-01-2006", tanggal_menu)
 	date_sql := date.Format("2006-01-02")
 
-	sqlStatement := "SELECT id_menu, nama_menu, harga_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu, foto_menu FROM menu WHERE tanggal_menu=? && id_catering=? "
+	sqlStatement := "SELECT id_menu, nama_menu, harga_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu FROM menu WHERE tanggal_menu=? && id_catering=? "
 
 	err := con.QueryRow(sqlStatement, date_sql, id_catering).Scan(&menu.Id_menu,
 		&menu.Nama_menu, &menu.Harga_menu, &menu.Jam_pengiriman_awal,
@@ -250,7 +250,7 @@ func Edit_Menu(id_catering string, id_menu string, nama_menu string, harga_menu 
 			return res, err
 		}
 
-		result, err := stmt.Exec(nm_s, hg, jaw, jak, id_catering, tanggal_menu)
+		result, err := stmt.Exec(nm_s, hg, jaw, jak, id_catering, date_sql)
 
 		if err != nil {
 			return res, err
@@ -274,14 +274,19 @@ func Edit_Menu(id_catering string, id_menu string, nama_menu string, harga_menu 
 	return res, nil
 }
 
+//delete menu
 func Delete_Menu(id_catering string, id_menu string, tanggal_menu string) (tools.Response, error) {
 	var res tools.Response
 	var menu str.Read_Menu_String
 
 	con := db.CreateCon()
 
+	fmt.Println(tanggal_menu)
+
 	date, _ := time.Parse("02-01-2006", tanggal_menu)
 	date_sql := date.Format("2006-01-02")
+
+	fmt.Println(date_sql)
 
 	sqlStatement := "SELECT id_menu, nama_menu, harga_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu, foto_menu FROM menu WHERE tanggal_menu=? && id_catering=? "
 
@@ -343,7 +348,7 @@ func Delete_Menu(id_catering string, id_menu string, tanggal_menu string) (tools
 			return res, err
 		}
 
-		result, err := stmt.Exec(id, nm_s, hg, jaw, jak, st_st, ft, id_catering, tanggal_menu)
+		result, err := stmt.Exec(id, nm_s, hg, jaw, jak, st_st, ft, id_catering, date_sql)
 
 		if err != nil {
 			return res, err
@@ -367,6 +372,7 @@ func Delete_Menu(id_catering string, id_menu string, tanggal_menu string) (tools
 	return res, nil
 }
 
+//upload foto
 func Upload_Foto_Menu(id_catering string, id_menu string, tanggal_menu string, writer http.ResponseWriter, request *http.Request) (tools.Response, error) {
 	var res tools.Response
 	var fotm str.Foto_Menu

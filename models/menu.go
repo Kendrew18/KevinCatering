@@ -360,11 +360,43 @@ func Delete_Menu(id_catering string, id_menu string, tanggal_menu string) (tools
 			return res, err
 		}
 
+		sqlStatement := "SELECT id_menu, nama_menu, harga_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu, foto_menu FROM menu WHERE tanggal_menu=? && id_catering=? "
+
+		err = con.QueryRow(sqlStatement, date_sql, id_catering).Scan(&menu.Id_menu,
+			&menu.Nama_menu, &menu.Harga_menu, &menu.Jam_pengiriman_awal,
+			&menu.Jam_pengiriman_akhir, &menu.Status_menu, &menu.Foto_menu)
+
+		if menu.Id_menu == "" {
+
+			sqlStatement = "DELETE FROM menu WHERE tanggal_menu=? && id_catering=?"
+
+			stmt, err = con.Prepare(sqlStatement)
+
+			if err != nil {
+				return res, err
+			}
+
+			result, err = stmt.Exec(date_sql, id_catering)
+
+			if err != nil {
+				return res, err
+			}
+
+			_, err = result.RowsAffected()
+
+			if err != nil {
+				return res, err
+			}
+		}
+
+		stmt.Close()
+
 		res.Status = http.StatusOK
 		res.Message = "Suksess"
 		res.Data = map[string]int64{
 			"rows": rowschanged,
 		}
+
 	} else {
 		res.Status = http.StatusNotFound
 		res.Message = "Tidak Dapat Diupdate"

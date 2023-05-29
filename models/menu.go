@@ -119,8 +119,13 @@ func Input_Menu(id_catering string, nama_menu string, harga_menu string, tanggal
 		stmt.Close()
 	}
 
+	sqlStatement = "SELECT id_menu FROM menu WHERE tanggal_menu=? && id_catering=?"
+
+	_ = con.QueryRow(sqlStatement, date_sql, id_catering).Scan(&id.Id_menu)
+
 	res.Status = http.StatusOK
 	res.Message = "Sukses"
+	res.Data = id
 
 	return res, nil
 }

@@ -74,13 +74,27 @@ func DeleteMenu(c echo.Context) error {
 }
 
 //upload_foto_menu
-
 func UploadFotoMenu(c echo.Context) error {
 	id_catering := c.FormValue("id_catering")
 	id_menu := c.FormValue("id_menu")
 	tanggal_menu := c.FormValue("tanggal_menu")
 
 	result, err := models.Upload_Foto_Menu(id_catering, id_menu, tanggal_menu, c.Response(), c.Request())
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+//read_menu_2_tgl
+func ReadMenu2Tgl(c echo.Context) error {
+	id_catering := c.FormValue("id_catering")
+	tanggal_menu := c.FormValue("tanggal_menu")
+	tanggal_menu2 := c.FormValue("tanggal_menu")
+
+	result, err := models.Read_Menu_2_tgl(id_catering, tanggal_menu, tanggal_menu2)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

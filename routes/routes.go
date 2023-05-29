@@ -50,6 +50,8 @@ func Init() *echo.Echo {
 	mn.POST("/input-menu", controllers.InputMenu)
 	//read_menu
 	mn.GET("/read-menu", controllers.ReadMenu)
+	//read_menu_2_tgl
+	mn.GET("/read-menu-2-tgl", controllers.ReadMenu2Tgl)
 	//Edit_menu
 	mn.PUT("/update-menu", controllers.EditMenu)
 	//Delete_menu

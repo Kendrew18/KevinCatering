@@ -33,6 +33,8 @@ type Read_Detail_Order struct {
 	Alamat_catering  string       `json:"alamat_catering"`
 	No_telp_catering string       `json:"no_telp_catering"`
 	Tanggal_order    string       `json:"tanggal_order"`
+	Longtitude       float64      `json:"longtitude"`
+	Langtitude       float64      `json:"langtitude"`
 	Menu_order       []Menu_Order `json:"menu_order"`
 	Total            int64        `json:"total"`
 }

@@ -62,7 +62,7 @@ func Generate_Id_Pembayaran() int {
 
 //Input_Order
 func Input_Order(id_catering string, id_user string, id_menu string, nama_menu string, harga_menu string,
-	tanggal_order string, tanggal_menu string, status_order string) (tools.Response, error) {
+	tanggal_order string, tanggal_menu string, status_order string, langtitude float64, longtitude float64) (tools.Response, error) {
 	var res tools.Response
 
 	con := db.CreateCon()
@@ -79,7 +79,7 @@ func Input_Order(id_catering string, id_user string, id_menu string, nama_menu s
 	date2, _ := time.Parse("02-01-2006", tanggal_order)
 	date_sql2 := date2.Format("2006-01-02")
 
-	sqlStatement := "INSERT INTO order_catering (id_order,id_catering,id_user, id_menu, nama_menu, harga_menu, total, tanggal_menu,tanggal_order, status_order) values(?,?,?,?,?,?,?,?,?)"
+	sqlStatement := "INSERT INTO order_catering (id_order,id_catering,id_user, id_menu, nama_menu, harga_menu, total, tanggal_menu,tanggal_order, status_order,longtitude,langtitude) values(?,?,?,?,?,?,?,?,?,?,?,?)"
 
 	stmt, err := con.Prepare(sqlStatement)
 
@@ -98,7 +98,7 @@ func Input_Order(id_catering string, id_user string, id_menu string, nama_menu s
 	}
 
 	_, err = stmt.Exec(id_OD, id_catering, id_user, id_menu, nama_menu, harga_menu,
-		total, date_sql, date_sql2, status_order)
+		total, date_sql, date_sql2, status_order, longtitude, langtitude)
 
 	nm2 := Generate_Id_Pembayaran()
 
@@ -175,11 +175,11 @@ func Read_Detail_Order(id_order string) (tools.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_order,order_catering.id_user,nama,u.telp_user,order_catering.id_catering, nama_catering,c.telp_catering,c.alamat_catering,tanggal_order,total, id_menu,nama_menu,harga_menu,tanggal_menu,status_order FROM order_catering JOIN catering c on order_catering.id_catering = c.id_catering join user u on order_catering.id_user = u.id_user WHERE id_order=?"
+	sqlStatement := "SELECT id_order,order_catering.id_user,nama,u.telp_user,order_catering.id_catering, nama_catering,c.telp_catering,c.alamat_catering,tanggal_order,total,longtitude,langtitude, id_menu,nama_menu,harga_menu,tanggal_menu,status_order FROM order_catering JOIN catering c on order_catering.id_catering = c.id_catering join user u on order_catering.id_user = u.id_user WHERE id_order=?"
 
 	err := con.QueryRow(sqlStatement, id_order).Scan(&obj.Id_order, &obj.Id_user, &obj.Nama_user, &obj.No_telp_user,
 		&obj.Id_catering, &obj.Nama_catering, &obj.No_telp_catering, &obj.Alamat_catering,
-		&obj.Tanggal_order, &obj.Total, &obj_str.Id_menu, &obj_str.Nama_menu, &obj_str.Harga_menu,
+		&obj.Tanggal_order, &obj.Total, &obj.Longtitude, &obj.Langtitude, &obj_str.Id_menu, &obj_str.Nama_menu, &obj_str.Harga_menu,
 		&obj_str.Tanggal_menu, &obj_str.Status_order)
 
 	if err != nil {

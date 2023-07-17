@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-//Generate_id_user
+//Generate_id_catering
 func Generate_Id_Catering() int {
 	var obj str.Generate_Id
 

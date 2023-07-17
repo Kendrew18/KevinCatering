@@ -23,6 +23,7 @@ func Init() *echo.Echo {
 	ORD := e.Group("/ORD")
 	PBR := e.Group("/PBR")
 	MP := e.Group("/MP")
+	BD := e.Group("/BD")
 
 	//user
 	//Sign_UP
@@ -91,6 +92,15 @@ func Init() *echo.Echo {
 	MP.POST("/input-maps", controllers.InputMaps)
 
 	MP.GET("/read-maps", controllers.ReadMaps)
+
+	//Budgeting
+	BD.POST("/input-budgeting", controllers.InputBudgeting)
+
+	BD.GET("/read-awal-budgeting", controllers.ReadAwalBudgeting)
+
+	BD.GET("/read-budgeting", controllers.ReadBudgeting)
+
+	//Realisasi
 
 	//Rating
 

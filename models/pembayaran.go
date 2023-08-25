@@ -110,6 +110,8 @@ func Read_Pembayaran(id_order string) (tools.Response, error) {
 
 	sqlStatement := "SELECT id_pembayaran,id_order,bukti_pembayaran,status_pembayaran FROM pembayaran WHERE id_order=?"
 
+	fmt.Println(id_order)
+
 	rows, err := con.Query(sqlStatement, id_order)
 
 	defer rows.Close()

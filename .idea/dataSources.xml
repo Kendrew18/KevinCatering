@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="@kostsoda.onthewifi.com" uuid="06aa2386-f471-42af-bcd3-93ae578f7d06">
+    <data-source source="LOCAL" name="gbt@kostsoda.onthewifi.com" uuid="9699dade-675f-492f-a405-c54c2c15c26c">
       <driver-ref>mariadb</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.mariadb.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mariadb://kostsoda.onthewifi.com:3306</jdbc-url>
+      <jdbc-url>jdbc:mariadb://kostsoda.onthewifi.com:3306/gbt</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

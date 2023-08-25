@@ -1,15 +1,5 @@
 package _struct
 
-type Read_Menu_String struct {
-	Id_menu              string `json:"id_menu"`
-	Nama_menu            string `json:"nama_menu"`
-	Harga_menu           string `json:"harga_menu"`
-	Jam_pengiriman_awal  string `json:"jam_pengiriman_awal"`
-	Jam_pengiriman_akhir string `json:"jam_pengiriman_akhir"`
-	Status_menu          string `json:"status_menu"`
-	Foto_menu            string `json:"foto_menu"`
-}
-
 type Read_Menu_fix struct {
 	Id_menu              string `json:"id_menu"`
 	Nama_menu            string `json:"nama_menu"`

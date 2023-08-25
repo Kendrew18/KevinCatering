@@ -39,8 +39,8 @@ func Generate_Id_Menu() int {
 }
 
 //input menu
-func Input_Menu(id_catering string, nama_menu string, harga_menu string, tanggal_menu string,
-	jam_pengiriman_awal string, jam_pengiriman_akhir string, status string) (tools.Response, error) {
+func Input_Menu(id_catering string, nama_menu string, harga_menu int64, tanggal_menu string,
+	jam_pengiriman_awal string, jam_pengiriman_akhir string, status int) (tools.Response, error) {
 	var res tools.Response
 	var id str.Read_Id_Menu
 	con := db.CreateCon()
@@ -54,74 +54,20 @@ func Input_Menu(id_catering string, nama_menu string, harga_menu string, tanggal
 	date, _ := time.Parse("02-01-2006", tanggal_menu)
 	date_sql := date.Format("2006-01-02")
 
-	sqlStatement := "SELECT id_menu FROM menu WHERE tanggal_menu=? && id_catering=?"
+	sqlStatement := "INSERT INTO menu (id_catering, id_menu, nama_menu, harga_menu, tanggal_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu,foto_menu) values(?,?,?,?,?,?,?,?,?)"
 
-	_ = con.QueryRow(sqlStatement, date_sql, id_catering).Scan(&id.Id_menu)
+	stmt, err := con.Prepare(sqlStatement)
 
-	if id.Id_menu == "" {
-
-		id_mn_all := "|" + id_MN + "|"
-		nm_mn := "|" + nama_menu + "|"
-		hg_mn := "|" + harga_menu + "|"
-		j_awal := "|" + jam_pengiriman_awal + "|"
-		j_akhir := "|" + jam_pengiriman_akhir + "|"
-		st := "|" + status + "|"
-
-		sqlStatement := "INSERT INTO menu (id_catering, id_menu, nama_menu, harga_menu, tanggal_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu,foto_menu) values(?,?,?,?,?,?,?,?,?)"
-
-		stmt, err := con.Prepare(sqlStatement)
-
-		if err != nil {
-			return res, err
-		}
-
-		_, err = stmt.Exec(id_catering, id_mn_all, nm_mn, hg_mn, date_sql, j_awal,
-			j_akhir, st, "|photo_menu/photo.jpg|")
-
-		stmt.Close()
-
-	} else {
-
-		var menu str.Read_Menu_String
-
-		sqlStatement := "SELECT id_menu, nama_menu, harga_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu, foto_menu FROM menu WHERE tanggal_menu=? && id_catering=? "
-
-		err := con.QueryRow(sqlStatement, date_sql, id_catering).Scan(&menu.Id_menu,
-			&menu.Nama_menu, &menu.Harga_menu, &menu.Jam_pengiriman_awal,
-			&menu.Jam_pengiriman_akhir, &menu.Status_menu, &menu.Foto_menu)
-
-		if err != nil {
-			return res, err
-		}
-
-		id_mn_all := menu.Id_menu + "|" + id_MN + "|"
-		nm_mn := menu.Nama_menu + "|" + nama_menu + "|"
-		hg_mn := menu.Harga_menu + "|" + harga_menu + "|"
-		j_awal := menu.Jam_pengiriman_awal + "|" + jam_pengiriman_awal + "|"
-		j_akhir := menu.Jam_pengiriman_akhir + "|" + jam_pengiriman_akhir + "|"
-		st := menu.Status_menu + "|" + status + "|"
-		fm := menu.Foto_menu + "|photo_menu/photo.jpg|"
-
-		sqlstatement := "UPDATE menu SET id_menu=?,nama_menu=?,harga_menu=?,jam_pengiriman_awal=?,jam_pengiriman_akhir=?,status_menu=?,foto_menu=? WHERE id_catering=? && tanggal_menu=?"
-
-		stmt, err := con.Prepare(sqlstatement)
-
-		if err != nil {
-			return res, err
-		}
-
-		_, err = stmt.Exec(id_mn_all, nm_mn, hg_mn, j_awal, j_akhir, st, fm, id_catering, date_sql)
-
-		if err != nil {
-			return res, err
-		}
-
-		stmt.Close()
+	if err != nil {
+		return res, err
 	}
 
-	sqlStatement = "SELECT id_menu FROM menu WHERE tanggal_menu=? && id_catering=?"
+	_, err = stmt.Exec(id_catering, id_MN, nama_menu, harga_menu, date_sql, jam_pengiriman_awal,
+		jam_pengiriman_akhir, status, "photo_menu/photo.jpg")
 
-	_ = con.QueryRow(sqlStatement, date_sql, id_catering).Scan(&id.Id_menu)
+	stmt.Close()
+
+	id.Id_menu = id_MN
 
 	res.Status = http.StatusOK
 	res.Message = "Sukses"
@@ -131,52 +77,108 @@ func Input_Menu(id_catering string, nama_menu string, harga_menu string, tanggal
 }
 
 //read_menu
-func Read_Menu(id_catering string, tanggal_menu string) (tools.Response, error) {
+func Read_Menu(id_catering string, tanggal_menu string, tanggal_menu2 string) (tools.Response, error) {
 	var res tools.Response
-	var rm str.Read_Menu
 	var obj str.Read_Menu_fix
-	var menu str.Read_Menu_String
-	var arr []str.Read_Menu
+	var arr []str.Read_Menu_fix
+	var obj_fix str.Read_Menu
+	var arr_fix []str.Read_Menu
 
 	con := db.CreateCon()
 
-	date, _ := time.Parse("02-01-2006", tanggal_menu)
-	date_sql := date.Format("2006-01-02")
+	if tanggal_menu2 == "" {
 
-	sqlStatement := "SELECT id_catering,tanggal_menu, id_menu, nama_menu, harga_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu, foto_menu FROM menu WHERE tanggal_menu=? && id_catering=? "
+		date, _ := time.Parse("02-01-2006", tanggal_menu)
+		date_sql := date.Format("2006-01-02")
 
-	err := con.QueryRow(sqlStatement, date_sql, id_catering).Scan(&rm.Id_catering, &rm.Tanggal_menu,
-		&menu.Id_menu, &menu.Nama_menu, &menu.Harga_menu, &menu.Jam_pengiriman_awal,
-		&menu.Jam_pengiriman_akhir, &menu.Status_menu, &menu.Foto_menu)
+		sqlStatement := "SELECT id_menu, nama_menu, harga_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu, foto_menu FROM menu WHERE tanggal_menu=? && id_catering=? "
 
-	if err != nil {
-		return res, err
+		rows, err := con.Query(sqlStatement, date_sql, id_catering)
+
+		defer rows.Close()
+
+		if err != nil {
+			return res, err
+		}
+
+		for rows.Next() {
+			err = rows.Scan(&obj.Id_menu, &obj.Nama_menu, &obj.Harga_menu,
+				&obj.Jam_pengiriman_awal, &obj.Jam_pengiriman_akhir, &obj.Status_menu, &obj.Foto_menu)
+			if err != nil {
+				return res, err
+			}
+			arr = append(arr, obj)
+		}
+
+		obj_fix.Id_catering = id_catering
+		obj_fix.Tanggal_menu = tanggal_menu
+		obj_fix.Menu = arr
+
+		arr_fix = append(arr_fix, obj_fix)
+
+	} else if tanggal_menu2 != "" {
+
+		var tgl str.Read_Tanggal
+		var arr_tgl []str.Read_Tanggal
+
+		date, _ := time.Parse("02-01-2006", tanggal_menu)
+		date_sql := date.Format("2006-01-02")
+
+		date2, _ := time.Parse("02-01-2006", tanggal_menu2)
+		date_sql2 := date2.Format("2006-01-02")
+
+		sqlStatement := "SELECT DISTINCT(tanggal_menu) FROM menu WHERE tanggal_menu>=? && tanggal_menu<=? && id_catering=? "
+
+		rows, err := con.Query(sqlStatement, date_sql, date_sql2, id_catering)
+
+		defer rows.Close()
+
+		if err != nil {
+			return res, err
+		}
+
+		for rows.Next() {
+			err = rows.Scan(&tgl.Tanggal)
+			if err != nil {
+				return res, err
+			}
+			arr_tgl = append(arr_tgl, tgl)
+		}
+
+		for i := 0; i < len(arr_tgl); i++ {
+
+			sqlStatement := "SELECT id_menu, nama_menu, harga_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu, foto_menu FROM menu WHERE tanggal_menu=? && id_catering=? "
+
+			rows, err := con.Query(sqlStatement, arr_tgl[i].Tanggal, id_catering)
+
+			defer rows.Close()
+
+			if err != nil {
+				return res, err
+			}
+
+			for rows.Next() {
+				err = rows.Scan(&obj.Id_menu, &obj.Nama_menu, &obj.Harga_menu,
+					&obj.Jam_pengiriman_awal, &obj.Jam_pengiriman_akhir, &obj.Status_menu, &obj.Foto_menu)
+				if err != nil {
+					return res, err
+				}
+				arr = append(arr, obj)
+			}
+
+			obj_fix.Id_catering = id_catering
+			obj_fix.Tanggal_menu = tanggal_menu
+			obj_fix.Menu = arr
+
+			arr_fix = append(arr_fix, obj_fix)
+
+		}
 	}
 
-	id_mn_all := tools.String_Separator_To_String(menu.Id_menu)
-	nm_mn := tools.String_Separator_To_String(menu.Nama_menu)
-	hg_mn := tools.String_Separator_To_Int64(menu.Harga_menu)
-	j_awal := tools.String_Separator_To_String(menu.Jam_pengiriman_awal)
-	j_akhir := tools.String_Separator_To_String(menu.Jam_pengiriman_akhir)
-	st := tools.String_Separator_To_Int(menu.Status_menu)
-	fm := tools.String_Separator_To_String(menu.Foto_menu)
-
-	for i := 0; i < len(id_mn_all); i++ {
-		obj.Id_menu = id_mn_all[i]
-		obj.Nama_menu = nm_mn[i]
-		obj.Harga_menu = hg_mn[i]
-		obj.Jam_pengiriman_awal = j_awal[i]
-		obj.Jam_pengiriman_akhir = j_akhir[i]
-		obj.Status_menu = st[i]
-		obj.Foto_menu = fm[i]
-		rm.Menu = append(rm.Menu, obj)
-	}
-	arr = append(arr, rm)
-
-	if arr == nil {
+	if arr_fix == nil {
 		res.Status = http.StatusNotFound
 		res.Message = "Not Found"
-		res.Data = arr
+		res.Data = arr_fix
 	} else {
 		res.Status = http.StatusOK
 		res.Message = "Sukses"
@@ -187,7 +189,7 @@ func Read_Menu(id_catering string, tanggal_menu string) (tools.Response, error) 
 }
 
 //read_menu_2_tgl
-func Read_Menu_2_tgl(id_catering string, tanggal_menu string, tanggal_menu2 string) (tools.Response, error) {
+/*func Read_Menu_2_tgl(id_catering string, tanggal_menu string, tanggal_menu2 string) (tools.Response, error) {
 	var res tools.Response
 	var rm str.Read_Menu
 	var obj str.Read_Menu_fix
@@ -244,64 +246,23 @@ func Read_Menu_2_tgl(id_catering string, tanggal_menu string, tanggal_menu2 stri
 
 	return res, nil
 }
-
+*/
 //edit menu
-func Edit_Menu(id_catering string, id_menu string, nama_menu string, harga_menu string,
-	tanggal_menu string, jam_pengiriman_awal string, jam_pengiriman_akhir string) (tools.Response, error) {
+func Edit_Menu(id_catering string, id_menu string, nama_menu string, harga_menu int64,
+	jam_pengiriman_awal string, jam_pengiriman_akhir string) (tools.Response, error) {
 	var res tools.Response
-	var menu str.Read_Menu_String
 
 	con := db.CreateCon()
 
-	date, _ := time.Parse("02-01-2006", tanggal_menu)
-	date_sql := date.Format("2006-01-02")
+	condition := ""
 
-	sqlStatement := "SELECT id_menu, nama_menu, harga_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu FROM menu WHERE tanggal_menu=? && id_catering=? "
+	sqlStatement := "SELECT id_detail_order FROM Detail_Order WHERE id_menu=? "
 
-	err := con.QueryRow(sqlStatement, date_sql, id_catering).Scan(&menu.Id_menu,
-		&menu.Nama_menu, &menu.Harga_menu, &menu.Jam_pengiriman_awal,
-		&menu.Jam_pengiriman_akhir, &menu.Status_menu)
+	_ = con.QueryRow(sqlStatement, id_menu).Scan(&condition)
 
-	if err != nil {
-		return res, err
-	}
+	if condition == "" {
 
-	id_mn_all := tools.String_Separator_To_String(menu.Id_menu)
-	nm_mn := tools.String_Separator_To_String(menu.Nama_menu)
-	hg_mn := tools.String_Separator_To_String(menu.Harga_menu)
-	j_awal := tools.String_Separator_To_String(menu.Jam_pengiriman_awal)
-	j_akhir := tools.String_Separator_To_String(menu.Jam_pengiriman_akhir)
-	st := tools.String_Separator_To_Int(menu.Status_menu)
-
-	condition := -1
-
-	for i := 0; i < len(id_mn_all); i++ {
-		if id_menu == id_mn_all[i] {
-			condition = st[i]
-		}
-	}
-
-	if condition == 0 {
-
-		nm_s := ""
-		hg := ""
-		jaw := ""
-		jak := ""
-
-		for i := 0; i < len(id_mn_all); i++ {
-			if id_menu == id_mn_all[i] {
-				nm_mn[i] = nama_menu
-				hg_mn[i] = harga_menu
-				j_awal[i] = jam_pengiriman_awal
-				j_akhir[i] = jam_pengiriman_akhir
-			}
-			nm_s = nm_s + "|" + nm_mn[i] + "|"
-			hg = hg + "|" + hg_mn[i] + "|"
-			jaw = jaw + "|" + j_awal[i] + "|"
-			jak = jak + "|" + j_akhir[i] + "|"
-		}
-
-		sqlstatement := "UPDATE menu SET nama_menu=?,harga_menu=?,jam_pengiriman_awal=?,jam_pengiriman_akhir=? WHERE id_catering=? && tanggal_menu=?"
+		sqlstatement := "UPDATE menu SET nama_menu=?,harga_menu=?,jam_pengiriman_awal=?,jam_pengiriman_akhir=? WHERE id_catering=? && id_menu=?"
 
 		stmt, err := con.Prepare(sqlstatement)
 
@@ -309,7 +270,7 @@ func Edit_Menu(id_catering string, id_menu string, nama_menu string, harga_menu 
 			return res, err
 		}
 
-		result, err := stmt.Exec(nm_s, hg, jaw, jak, id_catering, date_sql)
+		result, err := stmt.Exec(nama_menu, harga_menu, jam_pengiriman_awal, jam_pengiriman_akhir, id_catering, id_menu)
 
 		if err != nil {
 			return res, err
@@ -334,127 +295,43 @@ func Edit_Menu(id_catering string, id_menu string, nama_menu string, harga_menu 
 }
 
 //delete menu
-func Delete_Menu(id_catering string, id_menu string, tanggal_menu string) (tools.Response, error) {
+func Delete_Menu(id_catering string, id_menu string) (tools.Response, error) {
 	var res tools.Response
-	var menu str.Read_Menu_String
 
 	con := db.CreateCon()
 
-	fmt.Println(tanggal_menu)
+	sqlStatement := "SELECT id_detail_order FROM Detail_Order WHERE id_menu=? "
 
-	date, _ := time.Parse("02-01-2006", tanggal_menu)
-	date_sql := date.Format("2006-01-02")
+	condition := ""
 
-	fmt.Println(date_sql)
+	_ = con.QueryRow(sqlStatement, id_menu).Scan(&condition)
 
-	sqlStatement := "SELECT id_menu, nama_menu, harga_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu, foto_menu FROM menu WHERE tanggal_menu=? && id_catering=? "
+	if condition == "" {
 
-	err := con.QueryRow(sqlStatement, date_sql, id_catering).Scan(&menu.Id_menu,
-		&menu.Nama_menu, &menu.Harga_menu, &menu.Jam_pengiriman_awal,
-		&menu.Jam_pengiriman_akhir, &menu.Status_menu, &menu.Foto_menu)
+		sqlStatement = "DELETE FROM menu WHERE id_menu=? && id_catering=?"
 
-	if err != nil {
-		return res, err
-	}
-
-	id_mn_all := tools.String_Separator_To_String(menu.Id_menu)
-	nm_mn := tools.String_Separator_To_String(menu.Nama_menu)
-	hg_mn := tools.String_Separator_To_String(menu.Harga_menu)
-	j_awal := tools.String_Separator_To_String(menu.Jam_pengiriman_awal)
-	j_akhir := tools.String_Separator_To_String(menu.Jam_pengiriman_akhir)
-	st := tools.String_Separator_To_Int(menu.Status_menu)
-	st_s := tools.String_Separator_To_String(menu.Status_menu)
-	foto := tools.String_Separator_To_String(menu.Foto_menu)
-
-	condition := -1
-
-	for i := 0; i < len(id_mn_all); i++ {
-		if id_menu == id_mn_all[i] {
-			condition = st[i]
-		}
-	}
-
-	if condition == 0 {
-
-		nm_s := ""
-		hg := ""
-		jaw := ""
-		jak := ""
-		id := ""
-		st_st := ""
-		ft := ""
-
-		for i := 0; i < len(id_mn_all); i++ {
-			if id_menu == id_mn_all[i] {
-
-			} else {
-				id = id + "|" + id_mn_all[i] + "|"
-				nm_s = nm_s + "|" + nm_mn[i] + "|"
-				hg = hg + "|" + hg_mn[i] + "|"
-				jaw = jaw + "|" + j_awal[i] + "|"
-				jak = jak + "|" + j_akhir[i] + "|"
-				st_st = st_st + "|" + st_s[i] + "|"
-				ft = ft + "|" + foto[i] + "|"
-
-			}
-		}
-
-		sqlstatement := "UPDATE menu SET id_menu=?,nama_menu=?,harga_menu=?,jam_pengiriman_awal=?,jam_pengiriman_akhir=?,status_menu=?,foto_menu=? WHERE id_catering=? && tanggal_menu=?"
-
-		stmt, err := con.Prepare(sqlstatement)
+		stmt, err := con.Prepare(sqlStatement)
 
 		if err != nil {
 			return res, err
 		}
 
-		result, err := stmt.Exec(id, nm_s, hg, jaw, jak, st_st, ft, id_catering, date_sql)
+		result, err := stmt.Exec(id_menu, id_catering)
 
 		if err != nil {
 			return res, err
 		}
 
-		rowschanged, err := result.RowsAffected()
+		_, err = result.RowsAffected()
 
 		if err != nil {
 			return res, err
-		}
-
-		sqlStatement := "SELECT id_menu, nama_menu, harga_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu, foto_menu FROM menu WHERE tanggal_menu=? && id_catering=? "
-
-		err = con.QueryRow(sqlStatement, date_sql, id_catering).Scan(&menu.Id_menu,
-			&menu.Nama_menu, &menu.Harga_menu, &menu.Jam_pengiriman_awal,
-			&menu.Jam_pengiriman_akhir, &menu.Status_menu, &menu.Foto_menu)
-
-		if menu.Id_menu == "" {
-
-			sqlStatement = "DELETE FROM menu WHERE tanggal_menu=? && id_catering=?"
-
-			stmt, err = con.Prepare(sqlStatement)
-
-			if err != nil {
-				return res, err
-			}
-
-			result, err = stmt.Exec(date_sql, id_catering)
-
-			if err != nil {
-				return res, err
-			}
-
-			_, err = result.RowsAffected()
-
-			if err != nil {
-				return res, err
-			}
 		}
 
 		stmt.Close()
 
 		res.Status = http.StatusOK
 		res.Message = "Suksess"
-		res.Data = map[string]int64{
-			"rows": rowschanged,
-		}
 
 	} else {
 		res.Status = http.StatusNotFound
@@ -464,10 +341,9 @@ func Delete_Menu(id_catering string, id_menu string, tanggal_menu string) (tools
 }
 
 //upload foto
-func Upload_Foto_Menu(id_catering string, id_menu string, tanggal_menu string, writer http.ResponseWriter, request *http.Request) (tools.Response, error) {
+func Upload_Foto_Menu(id_catering string, id_menu string, writer http.ResponseWriter, request *http.Request) (tools.Response, error) {
 	var res tools.Response
 	var fotm str.Foto_Menu
-	var fotfx str.Foto_Menu_Fix
 
 	con := db.CreateCon()
 
@@ -480,142 +356,124 @@ func Upload_Foto_Menu(id_catering string, id_menu string, tanggal_menu string, w
 
 	defer file.Close()
 
-	date, _ := time.Parse("02-01-2006", tanggal_menu)
-	date_sql := date.Format("2006-01-02")
+	sqlStatement := "SELECT foto_menu FROM menu WHERE id_menu=? && id_catering=? "
 
-	sqlStatement := "SELECT id_menu, foto_menu FROM menu WHERE tanggal_menu=? && id_catering=? "
+	err = con.QueryRow(sqlStatement, id_menu, id_catering).Scan(&fotm.Path_Foto)
 
-	err = con.QueryRow(sqlStatement, date_sql, id_catering).Scan(&fotm.Id_menu, &fotm.Path_Foto)
+	fmt.Println(fotm.Path_Foto)
 
 	if err != nil {
 		return res, err
 	}
 
-	fotfx.Id_menu = tools.String_Separator_To_String(fotm.Id_menu)
-	fotfx.Path_Foto = tools.String_Separator_To_String(fotm.Path_Foto)
+	new_path := ""
 
-	tp1 := ""
+	if fotm.Path_Foto == "photo_menu/photo.jpg" {
 
-	tp2 := ""
+		fmt.Println("File Info")
+		fmt.Println("File Name : ", handler.Filename)
+		fmt.Println("File Size : ", handler.Size)
+		fmt.Println("File Type : ", handler.Header.Get("Content-Type"))
 
-	for i := 0; i < len(fotfx.Path_Foto); i++ {
-		if fotfx.Id_menu[i] == id_menu {
-			if fotfx.Path_Foto[i] == "photo_menu/photo.jpg" {
+		var tempFile *os.File
+		path := ""
 
-				fmt.Println("File Info")
-				fmt.Println("File Name : ", handler.Filename)
-				fmt.Println("File Size : ", handler.Size)
-				fmt.Println("File Type : ", handler.Header.Get("Content-Type"))
-
-				var tempFile *os.File
-				path := ""
-
-				if strings.Contains(handler.Filename, "jpg") {
-					path = "photo_menu/" + id_menu + ".jpg"
-					tempFile, err = ioutil.TempFile("photo_menu/", "Read"+"*.jpg")
-				}
-				if strings.Contains(handler.Filename, "jpeg") {
-					path = "photo_menu/" + id_menu + ".jpeg"
-					tempFile, err = ioutil.TempFile("photo_menu/", "Read"+"*.jpeg")
-				}
-				if strings.Contains(handler.Filename, "png") {
-					path = "photo_menu/" + id_menu + ".png"
-					tempFile, err = ioutil.TempFile("photo_menu/", "Read"+"*.png")
-				}
-
-				if err != nil {
-					return res, err
-				}
-
-				fileBytes, err2 := ioutil.ReadAll(file)
-				if err2 != nil {
-					return res, err2
-				}
-
-				_, err = tempFile.Write(fileBytes)
-				if err != nil {
-					return res, err
-				}
-
-				fmt.Println("Success!!")
-				fmt.Println(tempFile.Name())
-				tempFile.Close()
-
-				err = os.Rename(tempFile.Name(), path)
-				if err != nil {
-					fmt.Println(err)
-				}
-
-				defer tempFile.Close()
-
-				fmt.Println("new path:", tempFile.Name())
-
-				tp1 = tp1 + "|" + fotfx.Id_menu[i] + "|"
-				tp2 = tp2 + "|" + path + "|"
-
-			} else {
-				_ = os.Remove("./" + fotfx.Path_Foto[i])
-
-				fmt.Println("File Info")
-				fmt.Println("File Name : ", handler.Filename)
-				fmt.Println("File Size : ", handler.Size)
-				fmt.Println("File Type : ", handler.Header.Get("Content-Type"))
-
-				var tempFile *os.File
-				path := ""
-
-				if strings.Contains(handler.Filename, "jpg") {
-					path = "photo_menu/" + id_menu + ".jpg"
-					tempFile, err = ioutil.TempFile("photo_menu/", "Read"+"*.jpg")
-				}
-				if strings.Contains(handler.Filename, "jpeg") {
-					path = "photo_menu/" + id_menu + ".jpeg"
-					tempFile, err = ioutil.TempFile("photo_menu/", "Read"+"*.jpeg")
-				}
-				if strings.Contains(handler.Filename, "png") {
-					path = "photo_menu/" + id_menu + ".png"
-					tempFile, err = ioutil.TempFile("photo_menu/", "Read"+"*.png")
-				}
-
-				if err != nil {
-					return res, err
-				}
-
-				fileBytes, err2 := ioutil.ReadAll(file)
-				if err2 != nil {
-					return res, err2
-				}
-
-				_, err = tempFile.Write(fileBytes)
-				if err != nil {
-					return res, err
-				}
-
-				fmt.Println("Success!!")
-				fmt.Println(tempFile.Name())
-				tempFile.Close()
-
-				err = os.Rename(tempFile.Name(), path)
-				if err != nil {
-					fmt.Println(err)
-				}
-
-				defer tempFile.Close()
-
-				fmt.Println("new path:", tempFile.Name())
-
-				tp1 = tp1 + "|" + fotfx.Id_menu[i] + "|"
-				tp2 = tp2 + "|" + path + "|"
-			}
-
-		} else {
-			tp1 = tp1 + "|" + fotfx.Id_menu[i] + "|"
-			tp2 = tp2 + "|" + fotfx.Path_Foto[i] + "|"
+		if strings.Contains(handler.Filename, "jpg") {
+			path = "photo_menu/" + id_menu + ".jpg"
+			tempFile, err = ioutil.TempFile("photo_menu/", "Read"+"*.jpg")
+		}
+		if strings.Contains(handler.Filename, "jpeg") {
+			path = "photo_menu/" + id_menu + ".jpeg"
+			tempFile, err = ioutil.TempFile("photo_menu/", "Read"+"*.jpeg")
+		}
+		if strings.Contains(handler.Filename, "png") {
+			path = "photo_menu/" + id_menu + ".png"
+			tempFile, err = ioutil.TempFile("photo_menu/", "Read"+"*.png")
 		}
 
+		if err != nil {
+			return res, err
+		}
+
+		fileBytes, err2 := ioutil.ReadAll(file)
+		if err2 != nil {
+			return res, err2
+		}
+
+		_, err = tempFile.Write(fileBytes)
+		if err != nil {
+			return res, err
+		}
+
+		fmt.Println("Success!!")
+		fmt.Println(tempFile.Name())
+		tempFile.Close()
+
+		err = os.Rename(tempFile.Name(), path)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		defer tempFile.Close()
+
+		fmt.Println("new path:", tempFile.Name())
+
+		new_path = path
+	} else {
+		_ = os.Remove("./" + fotm.Path_Foto)
+
+		fmt.Println("File Info")
+		fmt.Println("File Name : ", handler.Filename)
+		fmt.Println("File Size : ", handler.Size)
+		fmt.Println("File Type : ", handler.Header.Get("Content-Type"))
+
+		var tempFile *os.File
+		path := ""
+
+		if strings.Contains(handler.Filename, "jpg") {
+			path = "photo_menu/" + id_menu + ".jpg"
+			tempFile, err = ioutil.TempFile("photo_menu/", "Read"+"*.jpg")
+		}
+		if strings.Contains(handler.Filename, "jpeg") {
+			path = "photo_menu/" + id_menu + ".jpeg"
+			tempFile, err = ioutil.TempFile("photo_menu/", "Read"+"*.jpeg")
+		}
+		if strings.Contains(handler.Filename, "png") {
+			path = "photo_menu/" + id_menu + ".png"
+			tempFile, err = ioutil.TempFile("photo_menu/", "Read"+"*.png")
+		}
+
+		if err != nil {
+			return res, err
+		}
+
+		fileBytes, err2 := ioutil.ReadAll(file)
+		if err2 != nil {
+			return res, err2
+		}
+
+		_, err = tempFile.Write(fileBytes)
+		if err != nil {
+			return res, err
+		}
+
+		fmt.Println("Success!!")
+		fmt.Println(tempFile.Name())
+		tempFile.Close()
+
+		err = os.Rename(tempFile.Name(), path)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		defer tempFile.Close()
+
+		fmt.Println("new path:", tempFile.Name())
+
+		new_path = path
 	}
 
-	sqlstatement := "UPDATE menu SET id_menu=?,foto_menu=? WHERE id_catering=? && tanggal_menu=?"
+	sqlstatement := "UPDATE menu SET foto_menu=? WHERE id_catering=? && id_menu=?"
 
 	stmt, err := con.Prepare(sqlstatement)
 
@@ -623,7 +481,7 @@ func Upload_Foto_Menu(id_catering string, id_menu string, tanggal_menu string, w
 		return res, err
 	}
 
-	result, err := stmt.Exec(tp1, tp2, id_catering, date_sql)
+	result, err := stmt.Exec(new_path, id_catering, id_menu)
 
 	if err != nil {
 		return res, err

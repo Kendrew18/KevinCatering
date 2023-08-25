@@ -69,8 +69,12 @@ func Sign_up(nama_user string, telp_user string, email_user string,
 
 		stmt.Close()
 
+		arr.Id_user = id_US
+		arr.Status_user = status_user
+
 		res.Status = http.StatusOK
 		res.Message = "Sukses"
+		res.Data = arr
 	} else {
 		res.Status = http.StatusNotFound
 		res.Message = "Status Not Found"

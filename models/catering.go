@@ -4,6 +4,7 @@ import (
 	"KevinCatering/db"
 	str "KevinCatering/struct"
 	"KevinCatering/tools"
+	"fmt"
 	"net/http"
 	"strconv"
 )
@@ -121,6 +122,8 @@ func Read_Catering(id_catering string) (tools.Response, error) {
 	sqlStatement := "SELECT id_catering, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan_catering, foto_profil_catering,rating FROM catering WHERE id_catering=?"
 
 	rows, err := con.Query(sqlStatement, id_catering)
+
+	fmt.Println(id_catering)
 
 	defer rows.Close()
 

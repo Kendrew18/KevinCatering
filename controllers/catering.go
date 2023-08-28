@@ -40,7 +40,7 @@ func ReadProfileCatering(c echo.Context) error {
 
 //Read_Catering
 func ReadCatering(c echo.Context) error {
-	id_catering := c.FormValue("id-catering")
+	id_catering := c.FormValue("id_catering")
 
 	result, err := models.Read_Catering(id_catering)
 

@@ -84,7 +84,7 @@ func Init() *echo.Echo {
 
 	//foto
 	//get image foto
-	PBR.GET("/read-foto", controllers.ReadFoto)
+	e.GET("/read-foto", controllers.ReadFoto)
 
 	//MAPS
 	MP.POST("/input-maps", controllers.InputMaps)

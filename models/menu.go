@@ -81,6 +81,8 @@ func Read_Menu(id_catering string, tanggal_menu string, tanggal_menu2 string) (t
 	var res tools.Response
 	var obj str.Read_Menu_fix
 	var arr []str.Read_Menu_fix
+	var obj_fix str.Read_Menu
+	var arr_fix []str.Read_Menu
 
 	con := db.CreateCon()
 
@@ -107,6 +109,12 @@ func Read_Menu(id_catering string, tanggal_menu string, tanggal_menu2 string) (t
 			}
 			arr = append(arr, obj)
 		}
+
+		obj_fix.Id_catering = id_catering
+		obj_fix.Tanggal_menu = tanggal_menu
+		obj_fix.Menu = arr
+
+		arr_fix = append(arr_fix, obj_fix)
 
 	} else if tanggal_menu2 != "" {
 
@@ -158,17 +166,23 @@ func Read_Menu(id_catering string, tanggal_menu string, tanggal_menu2 string) (t
 				arr = append(arr, obj)
 			}
 
+			obj_fix.Id_catering = id_catering
+			obj_fix.Tanggal_menu = tanggal_menu
+			obj_fix.Menu = arr
+
+			arr_fix = append(arr_fix, obj_fix)
+
 		}
 	}
 	fmt.Println(arr)
 	if arr == nil {
 		res.Status = http.StatusNotFound
 		res.Message = "Not Found"
-		res.Data = arr
+		res.Data = arr_fix
 	} else {
 		res.Status = http.StatusOK
 		res.Message = "Sukses"
-		res.Data = arr
+		res.Data = arr_fix
 	}
 
 	return res, nil

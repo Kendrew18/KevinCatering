@@ -264,3 +264,8 @@ func Read_Detail_Order(id_order string) (tools.Response, error) {
 	return res, nil
 
 }
+
+//Chage_Status_Order
+func Change_Status_Menu_Order() {
+
+}

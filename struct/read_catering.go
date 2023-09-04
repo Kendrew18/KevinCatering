@@ -10,4 +10,6 @@ type Read_Catering struct {
 	Tipe_pemesanan       []string `json:"tipe_pemesanan"`
 	Foto_profil_catering string   `json:"foto_profil_catering"`
 	Rating               float32  `json:"rating"`
+	Longtitude           string   `json:"longtitude"`
+	Langtitude           string   `json:"langtitude"`
 }

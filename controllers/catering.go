@@ -40,21 +40,8 @@ func ReadProfileCatering(c echo.Context) error {
 
 //Read_Catering
 func ReadCatering(c echo.Context) error {
-	id_catering := c.FormValue("id_catering")
 
-	result, err := models.Read_Catering(id_catering)
-
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
-	}
-
-	return c.JSON(http.StatusOK, result)
-}
-
-//Read_Awal_Catering
-func ReadAwalCatering(c echo.Context) error {
-
-	result, err := models.Read_Awal_Catering()
+	result, err := models.Read_Catering()
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

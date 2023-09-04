@@ -41,8 +41,6 @@ func Init() *echo.Echo {
 	cat.GET("/read-profile-cat", controllers.ReadProfileCatering)
 	//Read_Catering
 	cat.GET("/read-cat", controllers.ReadCatering)
-	//Read_Awal_Catering
-	cat.GET("/read-awal-cat", controllers.ReadAwalCatering)
 	//Edit_Profile_Catering
 	cat.PUT("/edit-prof-cat", controllers.EditProfileCatering)
 

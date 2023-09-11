@@ -13,31 +13,6 @@ import (
 	"time"
 )
 
-func Generate_Id_Menu() int {
-	var obj str.Generate_Id
-
-	con := db.CreateCon()
-
-	sqlStatement := "SELECT id_menu FROM generate_id"
-
-	_ = con.QueryRow(sqlStatement).Scan(&obj.Id)
-
-	no := obj.Id
-	no = no + 1
-
-	sqlstatement := "UPDATE generate_id SET id_menu=?"
-
-	stmt, err := con.Prepare(sqlstatement)
-
-	if err != nil {
-		return -1
-	}
-
-	stmt.Exec(no)
-
-	return no
-}
-
 //input menu
 func Input_Menu(id_catering string, nama_menu string, harga_menu int64, tanggal_menu string,
 	jam_pengiriman_awal string, jam_pengiriman_akhir string, status int) (tools.Response, error) {
@@ -45,16 +20,20 @@ func Input_Menu(id_catering string, nama_menu string, harga_menu int64, tanggal_
 	var id str.Read_Id_Menu
 	con := db.CreateCon()
 
-	nm := Generate_Id_Menu()
+	nm_str := 0
 
-	nm_str := strconv.Itoa(nm)
+	Sqlstatement := "SELECT co FROM menu ORDER BY co DESC Limit 1"
 
-	id_MN := "MN-" + nm_str
+	_ = con.QueryRow(Sqlstatement).Scan(&nm_str)
+
+	nm_str = nm_str + 1
+
+	id_MN := "MN-" + strconv.Itoa(nm_str)
 
 	date, _ := time.Parse("02-01-2006", tanggal_menu)
 	date_sql := date.Format("2006-01-02")
 
-	sqlStatement := "INSERT INTO menu (id_catering, id_menu, nama_menu, harga_menu, tanggal_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu,foto_menu) values(?,?,?,?,?,?,?,?,?)"
+	sqlStatement := "INSERT INTO menu (co, id_catering, id_menu, nama_menu, harga_menu, tanggal_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu,foto_menu) values(?,?,?,?,?,?,?,?,?,?)"
 
 	stmt, err := con.Prepare(sqlStatement)
 
@@ -62,8 +41,7 @@ func Input_Menu(id_catering string, nama_menu string, harga_menu int64, tanggal_
 		return res, err
 	}
 
-	_, err = stmt.Exec(id_catering, id_MN, nama_menu, harga_menu, date_sql, jam_pengiriman_awal,
-		jam_pengiriman_akhir, status, "photo_menu/photo.jpg")
+	_, err = stmt.Exec(nm_str, id_catering, id_MN, nama_menu, harga_menu, date_sql, jam_pengiriman_awal, jam_pengiriman_akhir, status, "photo_menu/photo.jpg")
 
 	stmt.Close()
 

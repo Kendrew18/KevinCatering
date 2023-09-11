@@ -8,32 +8,6 @@ import (
 	"strconv"
 )
 
-//Generate_id_catering
-func Generate_Id_Catering() int {
-	var obj str.Generate_Id
-
-	con := db.CreateCon()
-
-	sqlStatement := "SELECT id_catering FROM generate_id"
-
-	_ = con.QueryRow(sqlStatement).Scan(&obj.Id)
-
-	no := obj.Id
-	no = no + 1
-
-	sqlstatement := "UPDATE generate_id SET id_catering=?"
-
-	stmt, err := con.Prepare(sqlstatement)
-
-	if err != nil {
-		return -1
-	}
-
-	stmt.Exec(no)
-
-	return no
-}
-
 //Input_Catering
 func Input_Catering(id_user string, nama_catering string, alamat_catering string, telp_catering string,
 	email_catering string, deskripsi_catering string, tipe_catering string) (tools.Response, error) {
@@ -41,13 +15,17 @@ func Input_Catering(id_user string, nama_catering string, alamat_catering string
 
 	con := db.CreateCon()
 
-	nm := Generate_Id_Catering()
+	nm_str := 0
 
-	nm_str := strconv.Itoa(nm)
+	Sqlstatement := "SELECT co FROM catering ORDER BY co DESC Limit 1"
 
-	id_ct := "CT-" + nm_str
+	_ = con.QueryRow(Sqlstatement).Scan(&nm_str)
 
-	sqlStatement := "INSERT INTO catering (id_catering, id_user, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan_catering, foto_profil_catering, rating) values(?,?,?,?,?,?,?,?,?,?)"
+	nm_str = nm_str + 1
+
+	id_ct := "CT-" + strconv.Itoa(nm_str)
+
+	sqlStatement := "INSERT INTO catering (co, id_catering, id_user, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan_catering, foto_profil_catering, rating) values(?,?,?,?,?,?,?,?,?,?,?)"
 
 	stmt, err := con.Prepare(sqlStatement)
 
@@ -55,8 +33,7 @@ func Input_Catering(id_user string, nama_catering string, alamat_catering string
 		return res, err
 	}
 
-	_, err = stmt.Exec(id_ct, id_user, nama_catering, alamat_catering, telp_catering, email_catering,
-		deskripsi_catering, tipe_catering, "uploads/images.png", 0.0)
+	_, err = stmt.Exec(nm_str, id_ct, id_user, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_catering, "uploads/images.png", 0.0)
 
 	stmt.Close()
 
@@ -154,8 +131,7 @@ func Read_Catering() (tools.Response, error) {
 }
 
 //edit profile
-func Edit_Profile_Catering(id_catering string, nama_catering string, alamat_catering string,
-	telp_catering string, email_catering string, deskripsi_catering string) (tools.Response, error) {
+func Edit_Profile_Catering(id_catering string, nama_catering string, alamat_catering string, telp_catering string, email_catering string, deskripsi_catering string) (tools.Response, error) {
 	var res tools.Response
 
 	con := db.CreateCon()

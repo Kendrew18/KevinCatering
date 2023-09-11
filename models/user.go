@@ -9,32 +9,6 @@ import (
 	"strconv"
 )
 
-//Generate_id_user
-func Generate_Id_User() int {
-	var obj str.Generate_Id
-
-	con := db.CreateCon()
-
-	sqlStatement := "SELECT id_user FROM generate_id"
-
-	_ = con.QueryRow(sqlStatement).Scan(&obj.Id)
-
-	no := obj.Id
-	no = no + 1
-
-	sqlstatement := "UPDATE generate_id SET id_user=?"
-
-	stmt, err := con.Prepare(sqlstatement)
-
-	if err != nil {
-		return -1
-	}
-
-	stmt.Exec(no)
-
-	return no
-}
-
 //sign UP
 func Sign_up(nama_user string, telp_user string, email_user string,
 	username_user string, password_user string,
@@ -51,13 +25,17 @@ func Sign_up(nama_user string, telp_user string, email_user string,
 
 	if arr.Id_user == "" {
 
-		nm := Generate_Id_User()
+		nm_str := 0
 
-		nm_str := strconv.Itoa(nm)
+		Sqlstatement := "SELECT co FROM user ORDER BY co DESC Limit 1"
 
-		id_US := "US-" + nm_str
+		_ = con.QueryRow(Sqlstatement).Scan(&nm_str)
 
-		sqlStatement = "INSERT INTO user (id_user,nama,telp_user,email_user,username_user,password_user,foto_user,status_user) values(?,?,?,?,?,?,?,?)"
+		nm_str = nm_str + 1
+
+		id_US := "US-" + strconv.Itoa(nm_str)
+
+		sqlStatement = "INSERT INTO user (co,id_user,nama,telp_user,email_user,username_user,password_user,foto_user,status_user) values(?,?,?,?,?,?,?,?,?)"
 
 		stmt, err := con.Prepare(sqlStatement)
 
@@ -65,7 +43,7 @@ func Sign_up(nama_user string, telp_user string, email_user string,
 			return res, err
 		}
 
-		_, err = stmt.Exec(id_US, nama_user, telp_user, email_user, username_user, password_user, "uploads/images.png", status_user)
+		_, err = stmt.Exec(nm_str, id_US, nama_user, telp_user, email_user, username_user, password_user, "uploads/images.png", status_user)
 
 		stmt.Close()
 

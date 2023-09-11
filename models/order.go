@@ -9,94 +9,21 @@ import (
 	"time"
 )
 
-//Generate_id_user
-func Generate_Id_Order() int {
-	var obj str.Generate_Id
-
-	con := db.CreateCon()
-
-	sqlStatement := "SELECT id_order FROM generate_id"
-
-	_ = con.QueryRow(sqlStatement).Scan(&obj.Id)
-
-	no := obj.Id
-	no = no + 1
-
-	sqlstatement := "UPDATE generate_id SET id_order=?"
-
-	stmt, err := con.Prepare(sqlstatement)
-
-	if err != nil {
-		return -1
-	}
-
-	stmt.Exec(no)
-
-	return no
-}
-
-func Generate_Id_Pembayaran() int {
-	var obj str.Generate_Id
-
-	con := db.CreateCon()
-
-	sqlStatement := "SELECT id_pembayaran FROM generate_id"
-
-	_ = con.QueryRow(sqlStatement).Scan(&obj.Id)
-
-	no := obj.Id
-	no = no + 1
-
-	sqlstatement := "UPDATE generate_id SET id_pembayaran=?"
-
-	stmt, err := con.Prepare(sqlstatement)
-
-	if err != nil {
-		return -1
-	}
-
-	stmt.Exec(no)
-
-	return no
-}
-
-func Generate_Id_Detail_Order() int {
-	var obj str.Generate_Id
-
-	con := db.CreateCon()
-
-	sqlStatement := "SELECT detail_order FROM generate_id"
-
-	_ = con.QueryRow(sqlStatement).Scan(&obj.Id)
-
-	no := obj.Id
-	no = no + 1
-
-	sqlstatement := "UPDATE generate_id SET detail_order=?"
-
-	stmt, err := con.Prepare(sqlstatement)
-
-	if err != nil {
-		return -1
-	}
-
-	stmt.Exec(no)
-
-	return no
-}
-
 //Input_Order
-func Input_Order(id_catering string, id_user string, id_menu string, nama_menu string, jumlah string, harga_menu string,
-	tanggal_menu string, tanggal_order string, langtitude float64, longtitude float64) (tools.Response, error) {
+func Input_Order(id_catering string, id_user string, id_menu string, nama_menu string, jumlah string, harga_menu string, tanggal_menu string, tanggal_order string, langtitude float64, longtitude float64) (tools.Response, error) {
 	var res tools.Response
 
 	con := db.CreateCon()
 
-	nm := Generate_Id_Order()
+	nm_str := 0
 
-	nm_str := strconv.Itoa(nm)
+	Sqlstatement := "SELECT co FROM order_catering ORDER BY co DESC Limit 1"
 
-	id_OD := "OR-" + nm_str
+	_ = con.QueryRow(Sqlstatement).Scan(&nm_str)
+
+	nm_str = nm_str + 1
+
+	id_OD := "OR-" + strconv.Itoa(nm_str)
 
 	id_M := tools.String_Separator_To_String(id_menu)
 	nama_mn := tools.String_Separator_To_String(nama_menu)
@@ -112,29 +39,10 @@ func Input_Order(id_catering string, id_user string, id_menu string, nama_menu s
 	total = 0
 
 	for i := 0; i < len(id_M); i++ {
-		nm2 := Generate_Id_Detail_Order()
-
-		nm_str2 := strconv.Itoa(nm2)
-
-		id_DO := "DO-" + nm_str2
-
-		date, _ := time.Parse("02-01-2006", tgl_mn[i])
-		date_sql := date.Format("2006-01-02")
-
-		sqlStatement := "INSERT INTO Detail_Order (id_detail_order, id_order, id_menu, nama_menu, tanggal_menu,jumlah, harga_menu, status_order) values(?,?,?,?,?,?,?,?)"
-
-		stmt, err := con.Prepare(sqlStatement)
-
-		if err != nil {
-			return res, err
-		}
-
-		_, err = stmt.Exec(id_DO, id_OD, id_M[i], nama_mn[i], date_sql, jmlh_mn[i], harga_mn[i], 0)
-
 		total = total + (jmlh_mn[i] * harga_mn[i])
 	}
 
-	sqlStatement := "INSERT INTO order_catering (id_order,id_catering,id_user,total,tanggal_order,longtitude,langtitude) values(?,?,?,?,?,?,?)"
+	sqlStatement := "INSERT INTO order_catering (co, id_order,id_catering,id_user,total,tanggal_order,longtitude,langtitude) values(?,?,?,?,?,?,?,?)"
 
 	stmt, err := con.Prepare(sqlStatement)
 
@@ -142,15 +50,45 @@ func Input_Order(id_catering string, id_user string, id_menu string, nama_menu s
 		return res, err
 	}
 
-	_, err = stmt.Exec(id_OD, id_catering, id_user, total, date_sql2, longtitude, langtitude)
+	_, err = stmt.Exec(nm_str, id_OD, id_catering, id_user, total, date_sql2, longtitude, langtitude)
 
-	nm2 := Generate_Id_Pembayaran()
+	for i := 0; i < len(id_M); i++ {
+		nm_str2 := 0
 
-	nm_str2 := strconv.Itoa(nm2)
+		Sqlstatement := "SELECT co FROM Detail_Order ORDER BY co DESC Limit 1"
 
-	id_OD2 := "PBR-" + nm_str2
+		_ = con.QueryRow(Sqlstatement).Scan(&nm_str2)
 
-	sqlStatement = "INSERT INTO pembayaran (id_pembayaran,id_order,status_pembayaran,bukti_pembayaran) values(?,?,?,?)"
+		nm_str2 = nm_str2 + 1
+
+		id_DO := "DO-" + strconv.Itoa(nm_str2)
+
+		date, _ := time.Parse("02-01-2006", tgl_mn[i])
+		date_sql := date.Format("2006-01-02")
+
+		sqlStatement := "INSERT INTO Detail_Order (co,id_detail_order, id_order, id_menu, nama_menu, tanggal_menu,jumlah, harga_menu, status_order) values(?,?,?,?,?,?,?,?,?)"
+
+		stmt, err := con.Prepare(sqlStatement)
+
+		if err != nil {
+			return res, err
+		}
+
+		_, err = stmt.Exec(nm_str2, id_DO, id_OD, id_M[i], nama_mn[i], date_sql, jmlh_mn[i], harga_mn[i], 0)
+
+	}
+
+	nm_str2 := 0
+
+	Sqlstatement = "SELECT co FROM pembayaran ORDER BY co DESC Limit 1"
+
+	_ = con.QueryRow(Sqlstatement).Scan(&nm_str2)
+
+	nm_str2 = nm_str2 + 1
+
+	id_OD2 := "PBR-" + strconv.Itoa(nm_str2)
+
+	sqlStatement = "INSERT INTO pembayaran (co, id_pembayaran,id_order,status_pembayaran,bukti_pembayaran) values(?,?,?,?,?)"
 
 	stmt, err = con.Prepare(sqlStatement)
 
@@ -158,7 +96,7 @@ func Input_Order(id_catering string, id_user string, id_menu string, nama_menu s
 		return res, err
 	}
 
-	_, err = stmt.Exec(id_OD2, id_OD, 0, "")
+	_, err = stmt.Exec(nm_str2, id_OD2, id_OD, 0, "")
 
 	stmt.Close()
 

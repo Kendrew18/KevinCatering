@@ -8,32 +8,6 @@ import (
 	"strconv"
 )
 
-func Generate_Id_Pengantar() int {
-	var obj str.Generate_Id
-
-	con := db.CreateCon()
-
-	sqlStatement := "SELECT id_pengantar FROM generate_id"
-
-	_ = con.QueryRow(sqlStatement).Scan(&obj.Id)
-
-	no := obj.Id
-	no = no + 1
-
-	sqlstatement := "UPDATE generate_id SET id_pengantar=?"
-
-	stmt, err := con.Prepare(sqlstatement)
-
-	if err != nil {
-		return -1
-	}
-
-	stmt.Exec(no)
-
-	return no
-
-}
-
 func Sign_Up_Pengantar(id_catering string, nama_user string, telp_user string, email_user string,
 	username_user string, password_user string,
 	status_user int) (tools.Response, error) {
@@ -41,19 +15,27 @@ func Sign_Up_Pengantar(id_catering string, nama_user string, telp_user string, e
 
 	con := db.CreateCon()
 
-	nm := Generate_Id_User()
+	nm_str := 0
 
-	nm_str := strconv.Itoa(nm)
+	Sqlstatement := "SELECT co FROM user ORDER BY co DESC Limit 1"
 
-	id_US := "US-" + nm_str
+	_ = con.QueryRow(Sqlstatement).Scan(&nm_str)
 
-	nmp := Generate_Id_Pengantar()
+	nm_str = nm_str + 1
 
-	nm_strp := strconv.Itoa(nmp)
+	id_US := "US-" + strconv.Itoa(nm_str)
 
-	id_USP := "USP-" + nm_strp
+	nm_strp := 0
 
-	sqlStatement := "INSERT INTO user (id_user,nama,telp_user,email_user,username_user,password_user,foto_user,status_user) values(?,?,?,?,?,?,?,?)"
+	Sqlstatement = "SELECT co FROM pengantar ORDER BY co DESC Limit 1"
+
+	_ = con.QueryRow(Sqlstatement).Scan(&nm_strp)
+
+	nm_strp = nm_strp + 1
+
+	id_USP := "USP-" + strconv.Itoa(nm_strp)
+
+	sqlStatement := "INSERT INTO user (co,id_user,nama,telp_user,email_user,username_user,password_user,foto_user,status_user) values(?,?,?,?,?,?,?,?,?)"
 
 	stmt, err := con.Prepare(sqlStatement)
 
@@ -61,9 +43,9 @@ func Sign_Up_Pengantar(id_catering string, nama_user string, telp_user string, e
 		return res, err
 	}
 
-	_, err = stmt.Exec(id_US, nama_user, telp_user, email_user, username_user, password_user, "uploads/images.png", status_user)
+	_, err = stmt.Exec(nm_str, id_US, nama_user, telp_user, email_user, username_user, password_user, "uploads/images.png", status_user)
 
-	sqlStatement = "INSERT INTO pengantar (id_pengantar, id_user, id_catering) values(?,?,?)"
+	sqlStatement = "INSERT INTO pengantar (co,id_pengantar, id_user, id_catering) values(?,?,?,?)"
 
 	stmt, err = con.Prepare(sqlStatement)
 
@@ -71,7 +53,7 @@ func Sign_Up_Pengantar(id_catering string, nama_user string, telp_user string, e
 		return res, err
 	}
 
-	_, err = stmt.Exec(id_USP, id_US, id_catering)
+	_, err = stmt.Exec(nm_strp, id_USP, id_US, id_catering)
 
 	stmt.Close()
 

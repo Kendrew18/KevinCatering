@@ -47,13 +47,17 @@ func Input_Maps(Id_catering string, longtitude float64, langtitude float64, radi
 
 	if maps.Id_catering == "" {
 
-		nm := Generate_Id_Maps()
+		nm_str := 0
 
-		nm_str := strconv.Itoa(nm)
+		Sqlstatement := "SELECT co FROM maps ORDER BY co DESC Limit 1"
 
-		id_ct := "MP-" + nm_str
+		_ = con.QueryRow(Sqlstatement).Scan(&nm_str)
 
-		sqlStatement := "INSERT INTO maps (id_maps, id_catering, longtitude, langtitude, radius) values(?,?,?,?,?)"
+		nm_str = nm_str + 1
+
+		id_ct := "MP-" + strconv.Itoa(nm_str)
+
+		sqlStatement := "INSERT INTO maps (co, id_maps, id_catering, longtitude, langtitude, radius) values(?,?,?,?,?,?)"
 
 		stmt, err := con.Prepare(sqlStatement)
 
@@ -61,7 +65,7 @@ func Input_Maps(Id_catering string, longtitude float64, langtitude float64, radi
 			return res, err
 		}
 
-		_, err = stmt.Exec(id_ct, Id_catering, longtitude, langtitude, radius)
+		_, err = stmt.Exec(nm_str, id_ct, Id_catering, longtitude, langtitude, radius)
 
 		stmt.Close()
 

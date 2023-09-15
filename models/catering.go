@@ -9,8 +9,7 @@ import (
 )
 
 //Input_Catering
-func Input_Catering(id_user string, nama_catering string, alamat_catering string, telp_catering string,
-	email_catering string, deskripsi_catering string, tipe_catering string) (tools.Response, error) {
+func Input_Catering(id_user string, nama_catering string, alamat_catering string, telp_catering string, email_catering string, deskripsi_catering string, tipe_catering string) (tools.Response, error) {
 	var res tools.Response
 
 	con := db.CreateCon()

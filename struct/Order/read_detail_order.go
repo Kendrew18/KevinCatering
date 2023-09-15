@@ -1,4 +1,4 @@
-package _struct
+package Order
 
 type Menu_Order_String struct {
 	Id_menu              string `json:"id_menu"`
@@ -23,18 +23,19 @@ type Menu_Order struct {
 }
 
 type Read_Detail_Order struct {
-	Id_order         string       `json:"id_order"`
-	Id_user          string       `json:"id_user"`
-	Nama_user        string       `json:"nama_user"`
-	Alamat_user      string       `json:"alamat_user"`
-	No_telp_user     string       `json:"no_telp_user"`
-	Id_catering      string       `json:"id_catering"`
-	Nama_catering    string       `json:"nama_catering"`
-	Alamat_catering  string       `json:"alamat_catering"`
-	No_telp_catering string       `json:"no_telp_catering"`
-	Tanggal_order    string       `json:"tanggal_order"`
-	Longtitude       float64      `json:"longtitude"`
-	Langtitude       float64      `json:"langtitude"`
-	Menu_order       []Menu_Order `json:"menu_order"`
-	Total            int64        `json:"total"`
+	Id_order              string       `json:"id_order"`
+	Id_user               string       `json:"id_user"`
+	Nama_user             string       `json:"nama_user"`
+	Alamat_user           string       `json:"alamat_user"`
+	No_telp_user          string       `json:"no_telp_user"`
+	Id_catering           string       `json:"id_catering"`
+	Nama_catering         string       `json:"nama_catering"`
+	Alamat_catering       string       `json:"alamat_catering"`
+	No_telp_catering      string       `json:"no_telp_catering"`
+	Tanggal_order         string       `json:"tanggal_order"`
+	Longtitude            float64      `json:"longtitude"`
+	Langtitude            float64      `json:"langtitude"`
+	Foto_Bukti_pembayaran string       `json:"foto_bukti_pembayaran"`
+	Menu_order            []Menu_Order `json:"menu_order"`
+	Total                 int64        `json:"total"`
 }

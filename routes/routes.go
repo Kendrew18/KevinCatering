@@ -24,6 +24,7 @@ func Init() *echo.Echo {
 	PBR := e.Group("/PBR")
 	MP := e.Group("/MP")
 	BD := e.Group("/BD")
+	RL := e.Group("/RL")
 
 	//user
 	//Sign_UP
@@ -73,30 +74,46 @@ func Init() *echo.Echo {
 	ORD.GET("/read-order", controllers.ReadOrder)
 	//Read_Detail_order
 	ORD.GET("/read-detail-order", controllers.ReadDetailOrder)
+	//Read_Order_Menu
+	ORD.GET("/show-order-menu", controllers.ShowOrderMenu)
+	//Set_Pengantar
+	ORD.PUT("/set-pengantar", controllers.SetPegantar)
+	//Set_Pengantar
+	ORD.PUT("/confirm-order", controllers.ConfirmOrder)
+	//Order_Detail_User
+	ORD.GET("/order_detail_user", controllers.OrderDetailUser)
 
 	//Pembayaran
 	//Read_Pembayaran
 	PBR.GET("/read-pembayaran", controllers.ReadPembayaran)
 	//Upload_Foto_Pembayaran
 	PBR.POST("/upload-foto", controllers.UploadFotoPembayaran)
+	//Confirm_Pembayaran
+	PBR.PUT("/confirm-pembayaran", controllers.ConfirmPembayaran)
 
 	//foto
 	//get image foto
 	e.GET("/read-foto", controllers.ReadFoto)
 
 	//MAPS
+	//Input_Maps
 	MP.POST("/input-maps", controllers.InputMaps)
-
+	//Read_Maps
 	MP.GET("/read-maps", controllers.ReadMaps)
 
 	//Budgeting
+	//Input_Budgeting
 	BD.POST("/input-budgeting", controllers.InputBudgeting)
-
+	//Read_Awal_Budgeting
 	BD.GET("/read-awal-budgeting", controllers.ReadAwalBudgeting)
-
+	//Read_Budgeting
 	BD.GET("/read-budgeting", controllers.ReadBudgeting)
 
 	//Realisasi
+	//Input_Realisai
+	RL.POST("/input-realisasi", controllers.InputRealisasi)
+	//Read_Realisasi
+	RL.GET("/read-realisasi", controllers.ReadRealisasi)
 
 	//Rating
 

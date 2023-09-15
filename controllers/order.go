@@ -7,6 +7,7 @@ import (
 	"strconv"
 )
 
+//Input_Order
 func InputOrder(c echo.Context) error {
 	id_user := c.FormValue("id_user")
 	id_catering := c.FormValue("id_catering")
@@ -32,10 +33,11 @@ func InputOrder(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-func ReadOrder(c echo.Context) error {
+//Show_Order_Menu
+func ShowOrderMenu(c echo.Context) error {
 	id_user := c.FormValue("id_user")
 
-	result, err := models.Read_Order(id_user)
+	result, err := models.Show_Order_Menu(id_user)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
@@ -44,10 +46,39 @@ func ReadOrder(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-func ReadDetailOrder(c echo.Context) error {
-	id_order := c.FormValue("id_order")
+//Set_Pengantar
+func SetPegantar(c echo.Context) error {
+	id_detail_order := c.FormValue("id_detail_order")
+	id_pengantar := c.FormValue("id_pengantar")
 
-	result, err := models.Read_Detail_Order(id_order)
+	result, err := models.Set_Pegantar(id_detail_order, id_pengantar)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+//Confirm_Order
+func ConfirmOrder(c echo.Context) error {
+	id := c.FormValue("id")
+	id_detail_order := c.FormValue("id_detail_order")
+
+	result, err := models.Confirm_Order(id, id_detail_order)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+//Order_Detail_User
+func OrderDetailUser(c echo.Context) error {
+	id_detail_order := c.FormValue("id_detail_order")
+
+	result, err := models.Order_Detail_User(id_detail_order)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

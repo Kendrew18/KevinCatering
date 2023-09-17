@@ -1,4 +1,4 @@
-package _struct
+package User_Management
 
 type Read_user struct {
 	Id_user       string `json:"id_user"`

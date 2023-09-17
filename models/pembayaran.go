@@ -2,8 +2,8 @@ package models
 
 import (
 	"KevinCatering/db"
-	str "KevinCatering/struct"
 	"KevinCatering/struct/Order"
+	str "KevinCatering/struct/Pembayaran"
 	"KevinCatering/tools"
 	"fmt"
 	"io/ioutil"
@@ -151,10 +151,9 @@ func Read_Detail_Order_Recipe(id_order string) (tools.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_order,order_catering.id_user,nama,u.telp_user,order_catering.id_catering, nama_catering,c.telp_catering,c.alamat_catering,tanggal_order,total,longtitude,langtitude,bukti_pembayaran FROM order_catering JOIN catering c on order_catering.id_catering = c.id_catering join user u on order_catering.id_user = u.id_user JOIN pembayaran p on order_catering.id_order = p.id_order WHERE order_catering.id_order=?"
+	sqlStatement := "SELECT order_catering.id_order,order_catering.id_user,nama,u.telp_user,order_catering.id_catering, nama_catering,c.telp_catering,c.alamat_catering,tanggal_order,total,longtitude,langtitude,bukti_pembayaran FROM order_catering JOIN catering c on order_catering.id_catering = c.id_catering join user u on order_catering.id_user = u.id_user JOIN pembayaran p on order_catering.id_order = p.id_order WHERE order_catering.id_order=?"
 
 	err := con.QueryRow(sqlStatement, id_order).Scan(&obj.Id_order, &obj.Id_user, &obj.Nama_user, &obj.No_telp_user, &obj.Id_catering, &obj.Nama_catering, &obj.No_telp_catering, &obj.Alamat_catering, &obj.Tanggal_order, &obj.Total, &obj.Longtitude, &obj.Langtitude, &obj.Foto_Bukti_pembayaran)
-
 	if err != nil {
 		return res, err
 	}
@@ -170,8 +169,7 @@ func Read_Detail_Order_Recipe(id_order string) (tools.Response, error) {
 	}
 
 	for rows.Next() {
-		err = rows.Scan(&menu.Id_menu, &menu.Nama_menu, &menu.Tanggal_menu, &menu.Jumlah_menu,
-			&menu.Harga_menu, &menu.Jam_pengiriman_awal, &menu.Jam_pengiriman_akhir, &menu.Status_order)
+		err = rows.Scan(&menu.Id_menu, &menu.Nama_menu, &menu.Tanggal_menu, &menu.Jumlah_menu, &menu.Harga_menu, &menu.Jam_pengiriman_awal, &menu.Jam_pengiriman_akhir, &menu.Status_order)
 		if err != nil {
 			return res, err
 		}
@@ -196,49 +194,11 @@ func Read_Detail_Order_Recipe(id_order string) (tools.Response, error) {
 
 }
 
-//Read_Notif
-func Read_Notif(id_order string) (tools.Response, error) {
-	var res tools.Response
-	var menu Order.Menu_Order
-	var arr_menu []Order.Menu_Order
-
-	con := db.CreateCon()
-
-	sqlStatement := "SELECT detail_order.id_menu,detail_order.nama_menu,detail_order.tanggal_menu,detail_order.jumlah,detail_order.harga_menu,jam_pengiriman_awal,jam_pengiriman_akhir,detail_order.status_order FROM detail_order join menu m on detail_order.id_menu = m.id_menu WHERE id_order=?"
-
-	rows, err := con.Query(sqlStatement, id_order)
-
-	defer rows.Close()
-
-	if err != nil {
-		return res, err
-	}
-
-	for rows.Next() {
-		err = rows.Scan(&menu.Id_menu, &menu.Nama_menu, &menu.Tanggal_menu, &menu.Jumlah_menu,
-			&menu.Harga_menu, &menu.Jam_pengiriman_awal, &menu.Jam_pengiriman_akhir, &menu.Status_order)
-		if err != nil {
-			return res, err
-		}
-		arr_menu = append(arr_menu, menu)
-	}
-
-	if arr_menu == nil {
-		res.Status = http.StatusNotFound
-		res.Message = "Not Found"
-		res.Data = arr_menu
-	} else {
-		res.Status = http.StatusOK
-		res.Message = "Sukses"
-		res.Data = arr_menu
-	}
-
-	return res, nil
-}
-
 //Confirm_Pembayaran
 func Confirm_Pembayaran(id_order string) (tools.Response, error) {
 	var res tools.Response
+
+	var Read_Pembayaran_Fix str.Read_Pembayaran_Fix
 
 	con := db.CreateCon()
 
@@ -256,8 +216,13 @@ func Confirm_Pembayaran(id_order string) (tools.Response, error) {
 		return res, err
 	}
 
+	sqlstatement = "SELECT id_pembayaran, id_order, status_pembayaran FROM pembayaran WHERE id_order=?"
+
+	err = con.QueryRow(sqlstatement, id_order).Scan(&Read_Pembayaran_Fix.Id_pembayaran, &Read_Pembayaran_Fix.Id_order, &Read_Pembayaran_Fix.Status_pembayaran)
+
 	res.Status = http.StatusOK
 	res.Message = "Suksess"
+	res.Data = Read_Pembayaran_Fix
 
 	return res, nil
 }
@@ -298,6 +263,52 @@ func Read_Pembayaran(id_order string) (tools.Response, error) {
 		res.Status = http.StatusOK
 		res.Message = "Sukses"
 		res.Data = arr
+	}
+
+	return res, nil
+}
+
+//Read_Notif
+func Read_Notif(id_order string) (tools.Response, error) {
+	var res tools.Response
+	var notif str.Read_Notif
+	var menu str.Menu_Order_Notif
+	var arr_menu []str.Menu_Order_Notif
+
+	con := db.CreateCon()
+
+	sqlStatement := "SELECT detail_order.id_menu,detail_order.nama_menu,detail_order.tanggal_menu,detail_order.jumlah,detail_order.harga_menu,jam_pengiriman_awal,jam_pengiriman_akhir,detail_order.status_order FROM detail_order join menu m on detail_order.id_menu = m.id_menu WHERE detail_order.id_order=?"
+
+	rows, err := con.Query(sqlStatement, id_order)
+
+	defer rows.Close()
+
+	if err != nil {
+		return res, err
+	}
+
+	for rows.Next() {
+		err = rows.Scan(&menu.Id_menu, &menu.Nama_menu, &menu.Tanggal_menu, &menu.Jumlah_menu, &menu.Harga_menu, &menu.Jam_pengiriman_awal, &menu.Jam_pengiriman_akhir, &menu.Status_order)
+		if err != nil {
+			return res, err
+		}
+		arr_menu = append(arr_menu, menu)
+	}
+
+	sqlStatement = "SELECT bukti_pembayaran FROM pembayaran WHERE id_order=?"
+
+	err = con.QueryRow(sqlStatement, id_order).Scan(&notif.Path_Foto)
+
+	notif.Menu_Order_Notif = arr_menu
+
+	if arr_menu == nil {
+		res.Status = http.StatusNotFound
+		res.Message = "Not Found"
+		res.Data = notif
+	} else {
+		res.Status = http.StatusOK
+		res.Message = "Sukses"
+		res.Data = notif
 	}
 
 	return res, nil

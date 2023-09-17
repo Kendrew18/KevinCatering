@@ -1,4 +1,4 @@
-package _struct
+package Menu
 
 type Read_Menu_fix struct {
 	Id_menu              string `json:"id_menu"`

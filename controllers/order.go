@@ -35,9 +35,9 @@ func InputOrder(c echo.Context) error {
 
 //Show_Order_Menu
 func ShowOrderMenu(c echo.Context) error {
-	id_user := c.FormValue("id_user")
+	id := c.FormValue("id")
 
-	result, err := models.Show_Order_Menu(id_user)
+	result, err := models.Show_Order_Menu(id)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

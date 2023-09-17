@@ -1,4 +1,4 @@
-package _struct
+package Maps
 
 type Read_maps struct {
 	Id_maps     string  `json:"id_maps"`

@@ -2,7 +2,7 @@ package models
 
 import (
 	"KevinCatering/db"
-	str "KevinCatering/struct"
+	"KevinCatering/struct/User_Management"
 	"KevinCatering/tools"
 	"fmt"
 	"net/http"
@@ -15,7 +15,7 @@ func Sign_up(nama_user string, telp_user string, email_user string,
 	status_user int) (tools.Response, error) {
 	var res tools.Response
 
-	var arr str.Login
+	var arr User_Management.Login
 
 	con := db.CreateCon()
 
@@ -63,7 +63,7 @@ func Sign_up(nama_user string, telp_user string, email_user string,
 
 //login
 func Login(username string, password string) (tools.Response, error) {
-	var arr str.Login
+	var arr User_Management.Login
 	var res tools.Response
 
 	con := db.CreateCon()
@@ -92,8 +92,8 @@ func Login(username string, password string) (tools.Response, error) {
 //see profile
 func Read_Profile(id_user string) (tools.Response, error) {
 	var res tools.Response
-	var arr []str.Read_user
-	var obj str.Read_user
+	var arr []User_Management.Read_user
+	var obj User_Management.Read_user
 
 	con := db.CreateCon()
 

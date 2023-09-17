@@ -1,4 +1,4 @@
-package _struct
+package Pengantar
 
 type Read_pengantar struct {
 	Id_pengantar         string `json:"kode_pengantar"`

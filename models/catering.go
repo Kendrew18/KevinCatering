@@ -2,7 +2,7 @@ package models
 
 import (
 	"KevinCatering/db"
-	str "KevinCatering/struct"
+	"KevinCatering/struct/Catering"
 	"KevinCatering/tools"
 	"net/http"
 	"strconv"
@@ -45,9 +45,9 @@ func Input_Catering(id_user string, nama_catering string, alamat_catering string
 //see profile
 func Read_Profile_Catering(id_user string) (tools.Response, error) {
 	var res tools.Response
-	var arr []str.Read_Catering
-	var obj str.Read_Catering
-	var obj_c str.Tipe_Catering
+	var arr []Catering.Read_Catering
+	var obj Catering.Read_Catering
+	var obj_c Catering.Tipe_Catering
 
 	con := db.CreateCon()
 
@@ -88,13 +88,13 @@ func Read_Profile_Catering(id_user string) (tools.Response, error) {
 //see_catering
 func Read_Catering() (tools.Response, error) {
 	var res tools.Response
-	var arr []str.Read_Catering
-	var obj str.Read_Catering
-	var obj_c str.Tipe_Catering
+	var arr []Catering.Read_Catering
+	var obj Catering.Read_Catering
+	var obj_c Catering.Tipe_Catering
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT catering.id_catering, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan_catering, foto_profil_catering,rating,longtitude,langtitude FROM catering JOIN maps m on catering.id_catering = m.id_catering"
+	sqlStatement := "SELECT catering.id_catering, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan_catering, foto_profil_catering,rating,longtitude,langtitude FROM catering JOIN Maps m on catering.id_catering = m.id_catering"
 
 	rows, err := con.Query(sqlStatement)
 

@@ -2,7 +2,8 @@ package models
 
 import (
 	"KevinCatering/db"
-	str "KevinCatering/struct"
+	"KevinCatering/struct/Maps"
+	str "KevinCatering/struct/Pengantar"
 	"KevinCatering/tools"
 	"net/http"
 	"strconv"
@@ -128,8 +129,8 @@ func Update_Maps(id_user string, langtitude float64, longtitude float64) (tools.
 
 func Read_Maps_Pengantar(id_user string) (tools.Response, error) {
 	var res tools.Response
-	var maps str.Read_Maps_Pengantar
-	var maps_arr []str.Read_Maps_Pengantar
+	var maps Maps.Read_Maps_Pengantar
+	var maps_arr []Maps.Read_Maps_Pengantar
 
 	con := db.CreateCon()
 

@@ -1,16 +1,5 @@
 package Order
 
-type Menu_Order_String struct {
-	Id_menu              string `json:"id_menu"`
-	Tanggal_menu         string `json:"tanggal_menu"`
-	Nama_menu            string `json:"nama_menu"`
-	Jumlah_menu          string `json:"jumlah_menu"`
-	Harga_menu           string `json:"harga_menu"`
-	Jam_pengiriman_awal  string `json:"jam_pengiriman_awal"`
-	Jam_pengiriman_akhir string `json:"jam_pengiriman_akhir"`
-	Status_order         string `json:"status_order"`
-}
-
 type Menu_Order struct {
 	Id_menu              string `json:"id_menu"`
 	Tanggal_menu         string `json:"tanggal_menu"`
@@ -19,7 +8,7 @@ type Menu_Order struct {
 	Harga_menu           int64  `json:"harga_menu"`
 	Jam_pengiriman_awal  string `json:"jam_pengiriman_awal"`
 	Jam_pengiriman_akhir string `json:"jam_pengiriman_akhir"`
-	Status_order         int    `json:"status_order"`
+	Status_order         string `json:"status_order"`
 }
 
 type Read_Detail_Order struct {

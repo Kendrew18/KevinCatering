@@ -2,42 +2,16 @@ package models
 
 import (
 	"KevinCatering/db"
-	str "KevinCatering/struct"
+	"KevinCatering/struct/Maps"
 	"KevinCatering/tools"
 	"net/http"
 	"strconv"
 )
 
-//Generate_Id_Maps
-func Generate_Id_Maps() int {
-	var obj str.Generate_Id
-
-	con := db.CreateCon()
-
-	sqlStatement := "SELECT id_maps FROM generate_id"
-
-	_ = con.QueryRow(sqlStatement).Scan(&obj.Id)
-
-	no := obj.Id
-	no = no + 1
-
-	sqlstatement := "UPDATE generate_id SET id_maps=?"
-
-	stmt, err := con.Prepare(sqlstatement)
-
-	if err != nil {
-		return -1
-	}
-
-	stmt.Exec(no)
-
-	return no
-}
-
 //input_maps
 func Input_Maps(Id_catering string, longtitude float64, langtitude float64, radius int) (tools.Response, error) {
 	var res tools.Response
-	var maps str.Read_maps
+	var maps Maps.Read_maps
 
 	con := db.CreateCon()
 
@@ -98,8 +72,8 @@ func Input_Maps(Id_catering string, longtitude float64, langtitude float64, radi
 //Read_Maps
 func Read_Maps(Id_catering string) (tools.Response, error) {
 	var res tools.Response
-	var maps str.Read_maps
-	var maps_arr []str.Read_maps
+	var maps Maps.Read_maps
+	var maps_arr []Maps.Read_maps
 
 	con := db.CreateCon()
 

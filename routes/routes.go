@@ -13,7 +13,7 @@ func Init() *echo.Echo {
 	e.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
 
 	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Project-NDL")
+		return c.String(http.StatusOK, "Skripsi Kevin Catering")
 	})
 
 	user := e.Group("/user")
@@ -63,25 +63,21 @@ func Init() *echo.Echo {
 	//Read-Pengantar
 	PA.GET("/read-pengantar", controllers.ReadPengantar)
 	//Update-Maps-Pengantar
-	PA.PUT("/update-maps-pengantar", controllers.UpdateMaps)
+	PA.PUT("/update-Maps-pengantar", controllers.UpdateMaps)
 	//Read-Maps-Pengantar
-	PA.GET("/read-maps-pengantar", controllers.ReadMapsPengantar)
+	PA.GET("/read-Maps-pengantar", controllers.ReadMapsPengantar)
 
 	//Order
 	//input
 	ORD.POST("/input-order", controllers.InputOrder)
-	//Read_Order
-	ORD.GET("/read-order", controllers.ReadOrder)
-	//Read_Detail_order
-	ORD.GET("/read-detail-order", controllers.ReadDetailOrder)
 	//Read_Order_Menu
 	ORD.GET("/show-order-menu", controllers.ShowOrderMenu)
 	//Set_Pengantar
 	ORD.PUT("/set-pengantar", controllers.SetPegantar)
-	//Set_Pengantar
+	//Confirm_Order
 	ORD.PUT("/confirm-order", controllers.ConfirmOrder)
 	//Order_Detail_User
-	ORD.GET("/order_detail_user", controllers.OrderDetailUser)
+	ORD.GET("/order-detail-user", controllers.OrderDetailUser)
 
 	//Pembayaran
 	//Read_Pembayaran
@@ -90,6 +86,12 @@ func Init() *echo.Echo {
 	PBR.POST("/upload-foto", controllers.UploadFotoPembayaran)
 	//Confirm_Pembayaran
 	PBR.PUT("/confirm-pembayaran", controllers.ConfirmPembayaran)
+	//Read_Recipe_Order
+	PBR.GET("/read-recipe-order", controllers.ReadOrderRecipe)
+	//Read_Detail_Rescipe_order
+	PBR.GET("/read-detail-rescipe-order", controllers.ReadDetailOrderRecipe)
+	//Read_Notif_Pembayaran
+	PBR.GET("/read-notif-pembayaran", controllers.NotifPembayaran)
 
 	//foto
 	//get image foto
@@ -97,9 +99,9 @@ func Init() *echo.Echo {
 
 	//MAPS
 	//Input_Maps
-	MP.POST("/input-maps", controllers.InputMaps)
+	MP.POST("/input-Maps", controllers.InputMaps)
 	//Read_Maps
-	MP.GET("/read-maps", controllers.ReadMaps)
+	MP.GET("/read-Maps", controllers.ReadMaps)
 
 	//Budgeting
 	//Input_Budgeting

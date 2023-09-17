@@ -1,4 +1,4 @@
-package _struct
+package Catering
 
 type Tipe_Catering struct {
 	Tipe_catering string `json:"tipe_catering"`

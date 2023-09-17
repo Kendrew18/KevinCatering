@@ -4,6 +4,7 @@ import (
 	"KevinCatering/db"
 	"KevinCatering/struct/Order"
 	"KevinCatering/tools"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -53,6 +54,8 @@ func Input_Order(id_catering string, id_user string, id_menu string, nama_menu s
 
 	_, err = stmt.Exec(nm_str, id_OD, id_catering, id_user, total, date_sql2, longtitude, langtitude)
 
+	fmt.Println(id_M)
+
 	for i := 0; i < len(id_M); i++ {
 		nm_str2 := 0
 
@@ -67,7 +70,7 @@ func Input_Order(id_catering string, id_user string, id_menu string, nama_menu s
 		date, _ := time.Parse("02-01-2006", tgl_mn[i])
 		date_sql := date.Format("2006-01-02")
 
-		sqlStatement := "INSERT INTO detail_order (co,id_detail_order, id_order, id_menu, nama_menu, tanggal_menu,jumlah, harga_menu, status_order) values(?,?,?,?,?,?,?,?,?)"
+		sqlStatement := "INSERT INTO detail_order (co, id_detail_order, id_order, id_menu, nama_menu, tanggal_menu,jumlah, harga_menu, status_order) values(?,?,?,?,?,?,?,?,?)"
 
 		stmt, err := con.Prepare(sqlStatement)
 
@@ -75,8 +78,11 @@ func Input_Order(id_catering string, id_user string, id_menu string, nama_menu s
 			return res, err
 		}
 
-		_, err = stmt.Exec(nm_str2, id_DO, id_OD, id_M[i], nama_mn[i], date_sql, jmlh_mn[i], harga_mn[i], 0)
+		_, err = stmt.Exec(nm_str2, id_DO, id_OD, id_M[i], nama_mn[i], date_sql, jmlh_mn[i], harga_mn[i], "In-Progress")
 
+		if err != nil {
+			return res, err
+		}
 	}
 
 	nm_str2 := 0
@@ -116,6 +122,8 @@ func Set_Pegantar(id_detail_order string, id_pengantar string) (tools.Response, 
 	sqlstatement := "UPDATE detail_order SET id_pengantar=?, status_order=? WHERE id_detail_order=?"
 
 	stmt, err := con.Prepare(sqlstatement)
+
+	fmt.Println(id_detail_order, id_pengantar)
 
 	if err != nil {
 		return res, err
@@ -171,7 +179,7 @@ func Confirm_Order(id string, id_detail_order string) (tools.Response, error) {
 
 	if st_D == 1 && st_P == 1 {
 
-		sqlstatement = "UPDATE detail_order SET status_order=? WHERE id_detail_order=?"
+		sqlstatement = "UPDATE detail_order SET status_order=?, delivery_sukses=? WHERE id_detail_order=?"
 
 		stmt, err := con.Prepare(sqlstatement)
 
@@ -179,7 +187,7 @@ func Confirm_Order(id string, id_detail_order string) (tools.Response, error) {
 			return res, err
 		}
 
-		_, err = stmt.Exec("Complate", id_detail_order)
+		_, err = stmt.Exec("Complate", 1, id_detail_order)
 
 		if err != nil {
 			return res, err
@@ -240,7 +248,7 @@ func Show_Order_Menu(id string) (tools.Response, error) {
 
 	for i := 0; i < len(arr); i++ {
 		if i == len(arr)-1 {
-			q1 = q1 + "'" + arr[i].Id_Order + "') "
+			q1 = q1 + "'" + arr[i].Id_Order + "') && status_order != 'Complate' "
 		} else {
 			q1 = q1 + "'" + arr[i].Id_Order + "' , "
 		}

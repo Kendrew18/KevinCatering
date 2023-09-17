@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+//Read_Pembayaran
 func ReadPembayaran(c echo.Context) error {
 	id_order := c.FormValue("id_order")
 
@@ -18,6 +19,7 @@ func ReadPembayaran(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
+//Upload Foto Pembayaran
 func UploadFotoPembayaran(c echo.Context) error {
 	id_order := c.FormValue("id_order")
 
@@ -31,7 +33,7 @@ func UploadFotoPembayaran(c echo.Context) error {
 }
 
 //Read_Order_Recipe
-func ReadOrder(c echo.Context) error {
+func ReadOrderRecipe(c echo.Context) error {
 	id_user := c.FormValue("id_user")
 
 	result, err := models.Read_Order_Recipe(id_user)
@@ -44,7 +46,7 @@ func ReadOrder(c echo.Context) error {
 }
 
 //Read_Detail_Order_Recipe
-func ReadDetailOrder(c echo.Context) error {
+func ReadDetailOrderRecipe(c echo.Context) error {
 	id_order := c.FormValue("id_order")
 
 	result, err := models.Read_Detail_Order_Recipe(id_order)
@@ -61,6 +63,19 @@ func ConfirmPembayaran(c echo.Context) error {
 	id_order := c.FormValue("id_order")
 
 	result, err := models.Confirm_Pembayaran(id_order)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+//Notif Pembayaran
+func NotifPembayaran(c echo.Context) error {
+	id_order := c.FormValue("id_order")
+
+	result, err := models.Read_Notif(id_order)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

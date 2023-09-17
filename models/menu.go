@@ -3,6 +3,7 @@ package models
 import (
 	"KevinCatering/db"
 	str "KevinCatering/struct"
+	"KevinCatering/struct/Menu"
 	"KevinCatering/tools"
 	"fmt"
 	"io/ioutil"
@@ -16,7 +17,7 @@ import (
 //input menu
 func Input_Menu(id_catering string, nama_menu string, harga_menu int64, tanggal_menu string, jam_pengiriman_awal string, jam_pengiriman_akhir string, status int) (tools.Response, error) {
 	var res tools.Response
-	var id str.Read_Id_Menu
+	var id Menu.Read_Id_Menu
 	con := db.CreateCon()
 
 	nm_str := 0
@@ -56,10 +57,10 @@ func Input_Menu(id_catering string, nama_menu string, harga_menu int64, tanggal_
 //read_menu
 func Read_Menu(id_catering string, tanggal_menu string, tanggal_menu2 string) (tools.Response, error) {
 	var res tools.Response
-	var obj str.Read_Menu_fix
-	var arr []str.Read_Menu_fix
-	var obj_fix str.Read_Menu
-	var arr_fix []str.Read_Menu
+	var obj Menu.Read_Menu_fix
+	var arr []Menu.Read_Menu_fix
+	var obj_fix Menu.Read_Menu
+	var arr_fix []Menu.Read_Menu
 
 	con := db.CreateCon()
 

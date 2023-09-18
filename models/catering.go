@@ -94,7 +94,7 @@ func Read_Catering() (tools.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT catering.id_catering, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan_catering, foto_profil_catering,rating,longtitude,langtitude FROM catering JOIN Maps m on catering.id_catering = m.id_catering"
+	sqlStatement := "SELECT catering.id_catering, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan_catering, foto_profil_catering,rating,longtitude,langtitude FROM catering JOIN maps m on catering.id_catering = m.id_catering"
 
 	rows, err := con.Query(sqlStatement)
 

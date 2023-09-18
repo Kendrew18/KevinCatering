@@ -271,7 +271,7 @@ func Show_Order_Menu(id string) (tools.Response, error) {
 			return res, err
 		}
 
-		sqlStatement2 := "SELECT detail_order.id_order, id_detail_order, id_catering, id_pengantar, nama_menu, harga_menu FROM detail_order JOIN order_catering oc on detail_order.id_order = oc.id_order"
+		sqlStatement2 := "SELECT detail_order.id_order, id_detail_order, oc.id_catering,c.nama_catering,id_pengantar, nama_menu, harga_menu, status_order FROM detail_order JOIN order_catering oc on detail_order.id_order = oc.id_order JOIN catering c on c.id_catering = oc.id_catering"
 
 		sqlStatement2 = sqlStatement2 + q1 + q3
 
@@ -284,7 +284,7 @@ func Show_Order_Menu(id string) (tools.Response, error) {
 		}
 
 		for rows2.Next() {
-			err = rows2.Scan(&obj_order_menu.Id_order, &obj_order_menu.Id_detail_order, &obj_order_menu.Id_catering, &obj_order_menu.Id_pengantar, &obj_order_menu.Nama_menu, &obj_order_menu.Harga_menu)
+			err = rows2.Scan(&obj_order_menu.Id_order, &obj_order_menu.Id_detail_order, &obj_order_menu.Id_catering, &obj_order_menu.Nama_catering, &obj_order_menu.Id_pengantar, &obj_order_menu.Nama_menu, &obj_order_menu.Harga_menu, &obj_order_menu.Status_order)
 
 			if err != nil {
 				return res, err

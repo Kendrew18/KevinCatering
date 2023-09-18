@@ -18,9 +18,12 @@ type Menu_Order_Dipesan struct {
 	Id_order        string `json:"id_order"`
 	Id_detail_order string `json:"id_detail_order"`
 	Id_catering     string `json:"id_catering"`
+	Nama_catering   string `json:"nama_catering"`
 	Id_pengantar    string `json:"id_pengantar"`
+	Nama_pengantar  string `json:"nama_pengantar"`
 	Nama_menu       string `json:"nama_menu"`
 	Harga_menu      string `json:"harga_menu"`
+	Status_order    string `json:"status_order"`
 }
 
 type Read_Detail_Order_User struct {

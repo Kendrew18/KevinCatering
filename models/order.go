@@ -318,12 +318,17 @@ func Order_Detail_User(id_detail_order string) (tools.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT nama_menu, jumlah, harga_menu,u.nama, u.telp_user, status_order,nama_catering FROM detail_order JOIN pengantar p on detail_order.id_pengantar = p.id_pengantar JOIN user u on p.id_user = u.id_user JOIN order_catering oc on detail_order.id_order = oc.id_order JOIN catering c on oc.id_catering = c.id_catering WHERE id_detail_order=?"
+	sqlStatement := "SELECT nama_menu, jumlah, harga_menu,u.nama, u.telp_user, status_order, nama_catering FROM detail_order JOIN pengantar p on detail_order.id_pengantar = p.id_pengantar JOIN user u on p.id_user = u.id_user JOIN order_catering oc on detail_order.id_order = oc.id_order JOIN catering c on oc.id_catering = c.id_catering WHERE id_detail_order=?"
 
 	err := con.QueryRow(sqlStatement, id_detail_order).Scan(&obj.Nama_menu, &obj.Jumlah, &obj.Harga, &obj.Nama_pengantar, &obj.Nomer_telp, &obj.Status, &obj.Nama_catering)
 
 	if err != nil {
-		return res, err
+		arr = append(arr, obj)
+		res.Status = http.StatusNotFound
+		res.Message = "Not Found"
+		res.Data = arr
+
+		return res, nil
 	}
 
 	arr = append(arr, obj)

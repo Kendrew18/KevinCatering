@@ -12,4 +12,5 @@ type Read_Catering struct {
 	Rating               float32  `json:"rating"`
 	Longtitude           string   `json:"longtitude"`
 	Langtitude           string   `json:"langtitude"`
+	Radius               int      `json:"radius"`
 }

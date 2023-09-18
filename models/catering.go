@@ -94,7 +94,7 @@ func Read_Catering() (tools.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT catering.id_catering, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan_catering, foto_profil_catering,rating,longtitude,langtitude FROM catering JOIN maps m on catering.id_catering = m.id_catering"
+	sqlStatement := "SELECT catering.id_catering, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan_catering, foto_profil_catering,rating,longtitude,langtitude,radius FROM catering JOIN maps m on catering.id_catering = m.id_catering"
 
 	rows, err := con.Query(sqlStatement)
 
@@ -108,7 +108,7 @@ func Read_Catering() (tools.Response, error) {
 		err = rows.Scan(&obj.Id_catering, &obj.Nama_catering, &obj.Alamat_catering,
 			&obj.Telp_catering, &obj.Email_catering, &obj.Deskripsi_catering,
 			&obj_c.Tipe_catering, &obj.Foto_profil_catering, &obj.Rating,
-			&obj.Longtitude, &obj.Langtitude)
+			&obj.Longtitude, &obj.Langtitude, &obj.Radius)
 		obj.Tipe_pemesanan = tools.String_Separator_To_String(obj_c.Tipe_catering)
 		if err != nil {
 			return res, err

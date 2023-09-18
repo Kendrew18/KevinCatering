@@ -29,11 +29,13 @@ type Menu_Order_Dipesan struct {
 }
 
 type Read_Detail_Order_User struct {
-	Nama_pengantar string `json:"nama_pengantar"`
-	Status         string `json:"status"`
-	Nomer_telp     string `json:"nomer_telp"`
-	Nama_catering  string `json:"nama_catering"`
-	Nama_menu      string `json:"nama_menu"`
-	Jumlah         int    `json:"jumlah"`
-	Harga          int    `json:"harga"`
+	Nama_pengantar string  `json:"nama_pengantar"`
+	Status         string  `json:"status"`
+	Nomer_telp     string  `json:"nomer_telp"`
+	Nama_catering  string  `json:"nama_catering"`
+	Nama_menu      string  `json:"nama_menu"`
+	Jumlah         int     `json:"jumlah"`
+	Harga          int     `json:"harga"`
+	Langtitude     float64 `json:"langtitude"`
+	Longtitude     float64 `json:"longtitude"`
 }

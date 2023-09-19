@@ -123,6 +123,8 @@ func Read_Menu(id_catering string, tanggal_menu string, tanggal_menu2 string) (t
 		}
 
 		for i := 0; i < len(arr_tgl); i++ {
+			var obj Menu.Read_Menu_fix
+			var arr2 []Menu.Read_Menu_fix
 
 			sqlStatement := "SELECT id_menu, nama_menu, harga_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu, foto_menu FROM menu WHERE tanggal_menu=? && id_catering=? "
 
@@ -140,7 +142,7 @@ func Read_Menu(id_catering string, tanggal_menu string, tanggal_menu2 string) (t
 				if err != nil {
 					return res, err
 				}
-				arr = append(arr, obj)
+				arr2 = append(arr2, obj)
 			}
 
 			date_catering, _ := time.Parse("2006-01-02", arr_tgl[i].Tanggal)
@@ -148,13 +150,15 @@ func Read_Menu(id_catering string, tanggal_menu string, tanggal_menu2 string) (t
 
 			obj_fix.Id_catering = id_catering
 			obj_fix.Tanggal_menu = date_catering_fix
-			obj_fix.Menu = arr
+			obj_fix.Menu = arr2
+
+			arr = arr2
 
 			arr_fix = append(arr_fix, obj_fix)
 
 		}
 	}
-	fmt.Println(arr)
+
 	if arr == nil {
 		res.Status = http.StatusNotFound
 		res.Message = "Not Found"

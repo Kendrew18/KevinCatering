@@ -80,8 +80,7 @@ func Read_Menu(id_catering string, tanggal_menu string, tanggal_menu2 string) (t
 		}
 
 		for rows.Next() {
-			err = rows.Scan(&obj.Id_menu, &obj.Nama_menu, &obj.Harga_menu,
-				&obj.Jam_pengiriman_awal, &obj.Jam_pengiriman_akhir, &obj.Status_menu, &obj.Foto_menu)
+			err = rows.Scan(&obj.Id_menu, &obj.Nama_menu, &obj.Harga_menu, &obj.Jam_pengiriman_awal, &obj.Jam_pengiriman_akhir, &obj.Status_menu, &obj.Foto_menu)
 			if err != nil {
 				return res, err
 			}
@@ -144,8 +143,11 @@ func Read_Menu(id_catering string, tanggal_menu string, tanggal_menu2 string) (t
 				arr = append(arr, obj)
 			}
 
+			date_catering, _ := time.Parse("2006-01-02", arr_tgl[i].Tanggal)
+			date_catering_fix := date_catering.Format("02-01-2006")
+
 			obj_fix.Id_catering = id_catering
-			obj_fix.Tanggal_menu = tanggal_menu
+			obj_fix.Tanggal_menu = date_catering_fix
 			obj_fix.Menu = arr
 
 			arr_fix = append(arr_fix, obj_fix)

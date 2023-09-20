@@ -53,3 +53,12 @@ Method: GET
 Controller:
 
     id_order := c.FormValue("id_order")
+
+## Read QR Catering
+Link: kostsoda.onthewifi.com:3333/cat/get-QR-catering
+
+Method: GET
+
+Contoller:
+
+    id_catering := c.FormValue("id_catering")

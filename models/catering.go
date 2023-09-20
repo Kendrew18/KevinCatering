@@ -2,6 +2,7 @@ package models
 
 import (
 	"KevinCatering/db"
+	_struct "KevinCatering/struct"
 	"KevinCatering/struct/Catering"
 	"KevinCatering/tools"
 	"fmt"
@@ -243,4 +244,31 @@ func Edit_Profile_Catering(id_catering string, nama_catering string, alamat_cate
 	}
 
 	return res, nil
+}
+
+//Get_QR_Catering
+func Get_QR_Catering(id_catering string) (tools.Response, error) {
+	var res tools.Response
+
+	var obj _struct.Read_Path_Foto_QR
+
+	con := db.CreateCon()
+
+	sqlstatement := "SELECT path_foto_qr FROM catering WHERE id_catering=?"
+
+	err := con.QueryRow(sqlstatement, id_catering).Scan(&obj.Path_QR)
+
+	obj.Id_catering = id_catering
+
+	if err != nil {
+		fmt.Println(obj.Path_QR)
+		return res, err
+	} else {
+		res.Status = http.StatusOK
+		res.Message = "Sukses"
+		res.Data = obj
+	}
+
+	return res, nil
+
 }

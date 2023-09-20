@@ -44,6 +44,8 @@ func Init() *echo.Echo {
 	cat.GET("/read-cat", controllers.ReadCatering)
 	//Edit_Profile_Catering
 	cat.PUT("/edit-prof-cat", controllers.EditProfileCatering)
+	//Get_QR_Catering
+	cat.GET("/get-QR-catering", controllers.GetQRCatering)
 
 	//Menu
 	//input_menu

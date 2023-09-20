@@ -67,3 +67,16 @@ func EditProfileCatering(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, result)
 }
+
+//Get_QR_Catering
+func GetQRCatering(c echo.Context) error {
+	id_catering := c.FormValue("id_catering")
+
+	result, err := models.Get_QR_Catering(id_catering)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}

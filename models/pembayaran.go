@@ -95,6 +95,8 @@ func Upload_Foto_Pembayaran(id_order string, writer http.ResponseWriter, request
 		return res, err
 	}
 
+	stmt.Close()
+
 	res.Status = http.StatusOK
 	res.Message = "Sukses"
 

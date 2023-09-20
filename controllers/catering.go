@@ -16,7 +16,7 @@ func InputCatering(c echo.Context) error {
 	deskripsi_catering := c.FormValue("deskripsi_catering")
 	tipe_pemesanan := c.FormValue("tipe_pemesanan")
 
-	result, err := models.Input_Catering(id_user, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan)
+	result, err := models.Input_Catering(id_user, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan, c.Response(), c.Request())
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

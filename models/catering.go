@@ -4,12 +4,16 @@ import (
 	"KevinCatering/db"
 	"KevinCatering/struct/Catering"
 	"KevinCatering/tools"
+	"fmt"
+	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
+	"strings"
 )
 
 //Input_Catering
-func Input_Catering(id_user string, nama_catering string, alamat_catering string, telp_catering string, email_catering string, deskripsi_catering string, tipe_catering string) (tools.Response, error) {
+func Input_Catering(id_user string, nama_catering string, alamat_catering string, telp_catering string, email_catering string, deskripsi_catering string, tipe_catering string, writer http.ResponseWriter, request *http.Request) (tools.Response, error) {
 	var res tools.Response
 
 	con := db.CreateCon()
@@ -24,7 +28,7 @@ func Input_Catering(id_user string, nama_catering string, alamat_catering string
 
 	id_ct := "CT-" + strconv.Itoa(nm_str)
 
-	sqlStatement := "INSERT INTO catering (co, id_catering, id_user, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan_catering, foto_profil_catering, rating) values(?,?,?,?,?,?,?,?,?,?,?)"
+	sqlStatement := "INSERT INTO catering (co, id_catering, id_user, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan_catering, foto_profil_catering, rating,path_foto_qr) values(?,?,?,?,?,?,?,?,?,?,?,?)"
 
 	stmt, err := con.Prepare(sqlStatement)
 
@@ -32,7 +36,84 @@ func Input_Catering(id_user string, nama_catering string, alamat_catering string
 		return res, err
 	}
 
-	_, err = stmt.Exec(nm_str, id_ct, id_user, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_catering, "uploads/images.png", 0.0)
+	_, err = stmt.Exec(nm_str, id_ct, id_user, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_catering, "uploads/images.png", 0.0, "")
+
+	request.ParseMultipartForm(10 * 1024 * 1024)
+	file, handler, err := request.FormFile("photo")
+	if err != nil {
+		fmt.Println(err)
+		return res, err
+	}
+
+	defer file.Close()
+
+	fmt.Println("File Info")
+	fmt.Println("File Name : ", handler.Filename)
+	fmt.Println("File Size : ", handler.Size)
+	fmt.Println("File Type : ", handler.Header.Get("Content-Type"))
+
+	var tempFile *os.File
+	path := ""
+
+	if strings.Contains(handler.Filename, "jpg") {
+		path = "foto_qr_catering/" + id_ct + ".jpg"
+		tempFile, err = ioutil.TempFile("foto_qr_catering/", "Read"+"*.jpg")
+	}
+	if strings.Contains(handler.Filename, "jpeg") {
+		path = "foto_qr_catering/" + id_ct + ".jpeg"
+		tempFile, err = ioutil.TempFile("foto_qr_catering/", "Read"+"*.jpeg")
+	}
+	if strings.Contains(handler.Filename, "png") {
+		path = "foto_qr_catering/" + id_ct + ".png"
+		tempFile, err = ioutil.TempFile("foto_qr_catering/", "Read"+"*.png")
+	}
+
+	if err != nil {
+		return res, err
+	}
+
+	fileBytes, err2 := ioutil.ReadAll(file)
+	if err2 != nil {
+		return res, err2
+	}
+
+	_, err = tempFile.Write(fileBytes)
+	if err != nil {
+		return res, err
+	}
+
+	fmt.Println("Success!!")
+	fmt.Println(tempFile.Name())
+	tempFile.Close()
+
+	err = os.Rename(tempFile.Name(), path)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	defer tempFile.Close()
+
+	fmt.Println("new path:", tempFile.Name())
+
+	sqlstatement := "UPDATE catering SET path_foto_qr=? WHERE id_catering=?"
+
+	stmt, err = con.Prepare(sqlstatement)
+
+	if err != nil {
+		return res, err
+	}
+
+	result, err := stmt.Exec(path, id_ct)
+
+	if err != nil {
+		return res, err
+	}
+
+	_, err = result.RowsAffected()
+
+	if err != nil {
+		return res, err
+	}
 
 	stmt.Close()
 

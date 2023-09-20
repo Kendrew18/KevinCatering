@@ -70,6 +70,17 @@ func Login(username string, password string) (tools.Response, error) {
 
 	err := con.QueryRow(sqlStatement, username, password).Scan(&arr.Id_user, &arr.Status_user)
 
+	if arr.Status_user == 2 {
+		fmt.Println(arr.Id_user)
+		sqlStatement := "SELECT id_catering FROM catering WHERE id_user=?"
+
+		err = con.QueryRow(sqlStatement, arr.Id_user).Scan(&arr.Id_catering)
+
+		if err != nil {
+			return res, err
+		}
+	}
+
 	if err != nil || arr.Id_user == "" {
 		arr.Id_user = ""
 		arr.Status_user = 0

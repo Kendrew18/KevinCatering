@@ -10,9 +10,7 @@ import (
 )
 
 //sign UP
-func Sign_up(nama_user string, telp_user string, email_user string,
-	username_user string, password_user string,
-	status_user int) (tools.Response, error) {
+func Sign_up(nama_user string, telp_user string, email_user string, username_user string, password_user string, status_user int) (tools.Response, error) {
 	var res tools.Response
 
 	var arr User_Management.Login

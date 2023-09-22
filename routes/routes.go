@@ -2,6 +2,7 @@ package routes
 
 import (
 	"KevinCatering/controllers"
+	"KevinCatering/controllers/Rating"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"net/http"
@@ -25,6 +26,7 @@ func Init() *echo.Echo {
 	MP := e.Group("/MP")
 	BD := e.Group("/BD")
 	RL := e.Group("/RL")
+	RT := e.Group("/RT")
 
 	//user
 	//Sign_UP
@@ -80,6 +82,8 @@ func Init() *echo.Echo {
 	ORD.PUT("/confirm-order", controllers.ConfirmOrder)
 	//Order_Detail_User
 	ORD.GET("/order-detail-user", controllers.OrderDetailUser)
+	//History_Order
+	ORD.GET("/history-order", controllers.HistoryOrder)
 
 	//Pembayaran
 	//Read_Pembayaran
@@ -120,6 +124,7 @@ func Init() *echo.Echo {
 	RL.GET("/read-realisasi", controllers.ReadRealisasi)
 
 	//Rating
+	RT.POST("/input-rating", Rating.InputRating)
 
 	return e
 }

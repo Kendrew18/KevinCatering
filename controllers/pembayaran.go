@@ -34,9 +34,10 @@ func UploadFotoPembayaran(c echo.Context) error {
 
 //Read_Order_Recipe
 func ReadOrderRecipe(c echo.Context) error {
-	id_user := c.FormValue("id_user")
+	id := c.FormValue("id")
+	tanggal_recipe := c.FormValue("tanggal_recipe")
 
-	result, err := models.Read_Order_Recipe(id_user)
+	result, err := models.Read_Order_Recipe(id, tanggal_recipe)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

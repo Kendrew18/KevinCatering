@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 //upload-foto-pembayaran
@@ -103,17 +104,30 @@ func Upload_Foto_Pembayaran(id_order string, writer http.ResponseWriter, request
 	return res, nil
 }
 
-//Show_History_Order_Recipe
-func Read_Order_Recipe(id_user string) (tools.Response, error) {
+//Show_History_Order_Recipe [berubah]
+func Read_Order_Recipe(id string, tanggal_recipe string) (tools.Response, error) {
 	var res tools.Response
 	var arr []Order.Read_Order
 	var obj Order.Read_Order
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_order, nama_catering,tanggal_order FROM order_catering JOIN catering c on order_catering.id_catering = c.id_catering WHERE order_catering.id_user=?"
+	sqlStatement := ""
 
-	rows, err := con.Query(sqlStatement, id_user)
+	date_recipe, _ := time.Parse("02-01-2006", tanggal_recipe)
+	date_recipe_sql := date_recipe.Format("2006-01-02")
+
+	if strings.HasPrefix(id, "US") {
+		sqlStatement = "SELECT id_order, nama_catering,DATE_FORMAT(tanggal_order, '%d-%m-%Y') FROM order_catering JOIN catering c on order_catering.id_catering = c.id_catering WHERE order_catering.id_user=? && tanggal_order=?"
+	} else if strings.HasPrefix(id, "CT") {
+		sqlStatement = "SELECT id_order, nama_catering,DATE_FORMAT(tanggal_order, '%d-%m-%Y') FROM order_catering JOIN catering c on order_catering.id_catering = c.id_catering WHERE order_catering.id_catering=? && tanggal_order=?"
+	} else {
+		res.Status = http.StatusNotFound
+		res.Message = "Not Found"
+		res.Data = arr
+	}
+
+	rows, err := con.Query(sqlStatement, id, date_recipe_sql)
 
 	defer rows.Close()
 

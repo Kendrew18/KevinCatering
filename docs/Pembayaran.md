@@ -34,7 +34,8 @@ Method: GET
 
 Controllers:
 
-    id_user := c.FormValue("id_user")
+    id := c.FormValue("id")
+    tanggal_recipe := c.FormValue("tanggal_recipe")
 
 ## Read Detail Rescipe order
 Link: kostsoda.onthewifi.com:3333/PBR/read-detail-rescipe-order

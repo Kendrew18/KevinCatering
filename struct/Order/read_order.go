@@ -39,3 +39,20 @@ type Read_Detail_Order_User struct {
 	Langtitude     float64 `json:"langtitude"`
 	Longtitude     float64 `json:"longtitude"`
 }
+
+//Read_Menu_Order_His
+type Read_Menu_Order_His struct {
+	Tanggal_menu  string          `json:"tanggal_menu"`
+	History_Order []History_Order `json:"history_order"`
+}
+
+type History_Order struct {
+	Id_order        string `json:"id_order"`
+	Id_detail_order string `json:"id_detail_order"`
+	Id_catering     string `json:"id_catering"`
+	Nama_catering   string `json:"nama_catering"`
+	Nama_menu       string `json:"nama_menu"`
+	Harga_menu      string `json:"harga_menu"`
+	Status_order    string `json:"status_order"`
+	Rating          int    `json:"rating"`
+}

@@ -272,3 +272,47 @@ func Get_QR_Catering(id_catering string) (tools.Response, error) {
 	return res, nil
 
 }
+
+//Filter_Catering
+func Filter_Catering() (tools.Response, error) {
+	var res tools.Response
+	var arr []Catering.Read_Catering
+	var obj Catering.Read_Catering
+	var obj_c Catering.Tipe_Catering
+
+	con := db.CreateCon()
+
+	sqlStatement := "SELECT catering.id_catering, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan_catering, foto_profil_catering,rating,longtitude,langtitude,radius FROM catering JOIN maps m on catering.id_catering = m.id_catering"
+
+	rows, err := con.Query(sqlStatement)
+
+	defer rows.Close()
+
+	if err != nil {
+		return res, err
+	}
+
+	for rows.Next() {
+		err = rows.Scan(&obj.Id_catering, &obj.Nama_catering, &obj.Alamat_catering,
+			&obj.Telp_catering, &obj.Email_catering, &obj.Deskripsi_catering,
+			&obj_c.Tipe_catering, &obj.Foto_profil_catering, &obj.Rating,
+			&obj.Longtitude, &obj.Langtitude, &obj.Radius)
+		obj.Tipe_pemesanan = tools.String_Separator_To_String(obj_c.Tipe_catering)
+		if err != nil {
+			return res, err
+		}
+		arr = append(arr, obj)
+	}
+
+	if arr == nil {
+		res.Status = http.StatusNotFound
+		res.Message = "Not Found"
+		res.Data = arr
+	} else {
+		res.Status = http.StatusOK
+		res.Message = "Sukses"
+		res.Data = arr
+	}
+
+	return res, nil
+}

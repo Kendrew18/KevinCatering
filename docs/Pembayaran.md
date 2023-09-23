@@ -1,23 +1,5 @@
 # How TO Use API Pembayaran
-__________ 
-##  Read Pembayaran
-Link: kostsoda.onthewifi.com:3333/PBR/read-pembayaran
-
-Method: GET
-
-Controllers:
-
-    id_order := c.FormValue("id_order")
-
-## Upload Foto Pembayaran
-Link: kostsoda.onthewifi.com:3333/PBR/upload-foto
-
-Method: POST
-
-Controllers:
-
-    id_order := c.FormValue("id_order")
-
+__________
 ## Confirm Pembayaran
 Link: kostsoda.onthewifi.com:3333/PBR/confirm-pembayaran
 

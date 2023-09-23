@@ -2,6 +2,7 @@ package routes
 
 import (
 	"KevinCatering/controllers"
+	"KevinCatering/controllers/Favorite_Catering"
 	"KevinCatering/controllers/Rating"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -48,6 +49,10 @@ func Init() *echo.Echo {
 	cat.PUT("/edit-prof-cat", controllers.EditProfileCatering)
 	//Get_QR_Catering
 	cat.GET("/get-QR-catering", controllers.GetQRCatering)
+	//Filter_Catering
+	cat.GET("/filter-catering", controllers.FilterCatering)
+	//Favorite_Catering
+	cat.POST("/favorite-catering", Favorite_Catering.InputFavoriteCatering)
 
 	//Menu
 	//input_menu
@@ -88,8 +93,6 @@ func Init() *echo.Echo {
 	//Pembayaran
 	//Read_Pembayaran
 	PBR.GET("/read-pembayaran", controllers.ReadPembayaran)
-	//Upload_Foto_Pembayaran
-	PBR.POST("/upload-foto", controllers.UploadFotoPembayaran)
 	//Confirm_Pembayaran
 	PBR.PUT("/confirm-pembayaran", controllers.ConfirmPembayaran)
 	//Read_Recipe_Order

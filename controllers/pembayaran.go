@@ -19,19 +19,6 @@ func ReadPembayaran(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-//Upload Foto Pembayaran
-func UploadFotoPembayaran(c echo.Context) error {
-	id_order := c.FormValue("id_order")
-
-	result, err := models.Upload_Foto_Pembayaran(id_order, c.Response(), c.Request())
-
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
-	}
-
-	return c.JSON(http.StatusOK, result)
-}
-
 //Read_Order_Recipe
 func ReadOrderRecipe(c echo.Context) error {
 	id := c.FormValue("id")

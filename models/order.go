@@ -5,14 +5,16 @@ import (
 	"KevinCatering/struct/Order"
 	"KevinCatering/tools"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
 )
 
 //Input_Order
-func Input_Order(id_catering string, id_user string, id_menu string, nama_menu string, jumlah string, harga_menu string, tanggal_menu string, tanggal_order string, langtitude float64, longtitude float64) (tools.Response, error) {
+func Input_Order(id_catering string, id_user string, id_menu string, nama_menu string, jumlah string, harga_menu string, tanggal_menu string, tanggal_order string, langtitude float64, longtitude float64, writer http.ResponseWriter, request *http.Request) (tools.Response, error) {
 	var res tools.Response
 
 	con := db.CreateCon()
@@ -26,6 +28,65 @@ func Input_Order(id_catering string, id_user string, id_menu string, nama_menu s
 	nm_str = nm_str + 1
 
 	id_OD := "OR-" + strconv.Itoa(nm_str)
+
+	fmt.Println(id_OD)
+
+	request.ParseMultipartForm(10 * 1024 * 1024)
+	file, handler, err := request.FormFile("photo")
+	if err != nil {
+		fmt.Println(err)
+		return res, err
+	}
+
+	defer file.Close()
+
+	fmt.Println("File Info")
+	fmt.Println("File Name : ", handler.Filename)
+	fmt.Println("File Size : ", handler.Size)
+	fmt.Println("File Type : ", handler.Header.Get("Content-Type"))
+
+	var tempFile *os.File
+	path := ""
+
+	if strings.Contains(handler.Filename, "jpg") {
+		path = "uploads/" + id_OD + ".jpg"
+		tempFile, err = ioutil.TempFile("uploads/", "Read"+"*.jpg")
+	}
+	if strings.Contains(handler.Filename, "jpeg") {
+		path = "uploads/" + id_OD + ".jpeg"
+		tempFile, err = ioutil.TempFile("uploads/", "Read"+"*.jpeg")
+	}
+	if strings.Contains(handler.Filename, "png") {
+		path = "uploads/" + id_OD + ".png"
+		tempFile, err = ioutil.TempFile("uploads/", "Read"+"*.png")
+	}
+
+	if err != nil {
+		return res, err
+	}
+
+	fileBytes, err2 := ioutil.ReadAll(file)
+	if err2 != nil {
+		return res, err2
+	}
+
+	_, err = tempFile.Write(fileBytes)
+	if err != nil {
+		return res, err
+	}
+
+	fmt.Println("Success!!")
+	fmt.Println(tempFile.Name())
+	tempFile.Close()
+
+	err = os.Rename(tempFile.Name(), path)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	defer tempFile.Close()
+
+	fmt.Println("new path:", tempFile.Name())
 
 	id_M := tools.String_Separator_To_String(id_menu)
 	nama_mn := tools.String_Separator_To_String(nama_menu)
@@ -103,7 +164,7 @@ func Input_Order(id_catering string, id_user string, id_menu string, nama_menu s
 		return res, err
 	}
 
-	_, err = stmt.Exec(nm_str2, id_OD2, id_OD, 0, "")
+	_, err = stmt.Exec(nm_str2, id_OD2, id_OD, 0, path)
 
 	stmt.Close()
 
@@ -380,11 +441,12 @@ func History_Order(id_user string) (tools.Response, error) {
 	q1 := " WHERE detail_order.id_order IN ("
 	q2 := "ORDER BY tanggal_menu ASC"
 	q3 := " && tanggal_menu=?"
+
 	sqlStatement = "SELECT DISTINCT(detail_order.tanggal_menu) FROM detail_order"
 
 	for i := 0; i < len(arr); i++ {
 		if i == len(arr)-1 {
-			q1 = q1 + "'" + arr[i].Id_Order + "') && status_order == 'Complate' "
+			q1 = q1 + "'" + arr[i].Id_Order + "') && status_order = 'Complate' "
 		} else {
 			q1 = q1 + "'" + arr[i].Id_Order + "' , "
 		}
@@ -397,6 +459,7 @@ func History_Order(id_user string) (tools.Response, error) {
 	defer rows.Close()
 
 	if err != nil {
+		fmt.Println(sqlStatement)
 		return res, err
 	}
 

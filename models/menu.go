@@ -15,9 +15,10 @@ import (
 )
 
 //input menu
-func Input_Menu(id_catering string, nama_menu string, harga_menu int64, tanggal_menu string, jam_pengiriman_awal string, jam_pengiriman_akhir string, status int) (tools.Response, error) {
+func Input_Menu(id_catering string, nama_menu string, harga_menu int64, tanggal_menu string, jam_pengiriman_awal string, jam_pengiriman_akhir string, status int, writer http.ResponseWriter, request *http.Request) (tools.Response, error) {
 	var res tools.Response
 	var id Menu.Read_Id_Menu
+
 	con := db.CreateCon()
 
 	nm_str := 0
@@ -30,6 +31,65 @@ func Input_Menu(id_catering string, nama_menu string, harga_menu int64, tanggal_
 
 	id_MN := "MN-" + strconv.Itoa(nm_str)
 
+	request.ParseMultipartForm(10 * 1024 * 1024)
+	file, handler, err := request.FormFile("photo")
+
+	path := ""
+
+	if file != nil {
+		defer file.Close()
+
+		fmt.Println("File Info")
+		fmt.Println("File Name : ", handler.Filename)
+		fmt.Println("File Size : ", handler.Size)
+		fmt.Println("File Type : ", handler.Header.Get("Content-Type"))
+
+		var tempFile *os.File
+
+		if strings.Contains(handler.Filename, "jpg") {
+			path = "photo_menu/" + id_MN + ".jpg"
+			tempFile, err = ioutil.TempFile("photo_menu/", "Read"+"*.jpg")
+		}
+		if strings.Contains(handler.Filename, "jpeg") {
+			path = "photo_menu/" + id_MN + ".jpeg"
+			tempFile, err = ioutil.TempFile("photo_menu/", "Read"+"*.jpeg")
+		}
+		if strings.Contains(handler.Filename, "png") {
+			path = "photo_menu/" + id_MN + ".png"
+			tempFile, err = ioutil.TempFile("photo_menu/", "Read"+"*.png")
+		}
+
+		if err != nil {
+			return res, err
+		}
+
+		fileBytes, err2 := ioutil.ReadAll(file)
+		if err2 != nil {
+			return res, err2
+		}
+
+		_, err = tempFile.Write(fileBytes)
+		if err != nil {
+			return res, err
+		}
+
+		fmt.Println("Success!!")
+		fmt.Println(tempFile.Name())
+		tempFile.Close()
+
+		err = os.Rename(tempFile.Name(), path)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		defer tempFile.Close()
+
+		fmt.Println("new path:", tempFile.Name())
+
+	} else {
+		path = "photo_menu/photo.jpg"
+	}
+
 	date, _ := time.Parse("02-01-2006", tanggal_menu)
 	date_sql := date.Format("2006-01-02")
 
@@ -41,7 +101,7 @@ func Input_Menu(id_catering string, nama_menu string, harga_menu int64, tanggal_
 		return res, err
 	}
 
-	_, err = stmt.Exec(nm_str, id_catering, id_MN, nama_menu, harga_menu, date_sql, jam_pengiriman_awal, jam_pengiriman_akhir, status, "photo_menu/photo.jpg")
+	_, err = stmt.Exec(nm_str, id_catering, id_MN, nama_menu, harga_menu, date_sql, jam_pengiriman_awal, jam_pengiriman_akhir, status, path)
 
 	stmt.Close()
 
@@ -264,7 +324,7 @@ func Delete_Menu(id_catering string, id_menu string) (tools.Response, error) {
 	return res, nil
 }
 
-//upload foto
+//upload foto (buat update foto)
 func Upload_Foto_Menu(id_catering string, id_menu string, writer http.ResponseWriter, request *http.Request) (tools.Response, error) {
 	var res tools.Response
 	var fotm str.Foto_Menu

@@ -21,7 +21,7 @@ func InputMenu(c echo.Context) error {
 
 	hg, _ := strconv.ParseInt(harga_menu, 10, 64)
 
-	result, err := models.Input_Menu(id_catering, nama_menu, hg, tanggal_menu, jam_pengiriman_awal, jam_pengiriman_akhir, st)
+	result, err := models.Input_Menu(id_catering, nama_menu, hg, tanggal_menu, jam_pengiriman_awal, jam_pengiriman_akhir, st, c.Response(), c.Request())
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

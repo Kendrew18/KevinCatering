@@ -273,8 +273,15 @@ func Get_QR_Catering(id_catering string) (tools.Response, error) {
 
 }
 
+//Set Favorite Catering
+func Set_Favorite_Catering(id_user string, id_catering string) (tools.Response, error) {
+	var res tools.Response
+
+	return res, nil
+}
+
 //Filter_Catering
-func Filter_Catering() (tools.Response, error) {
+func Filter_Catering(tipe int, id_user string) (tools.Response, error) {
 	var res tools.Response
 	var arr []Catering.Read_Catering
 	var obj Catering.Read_Catering
@@ -282,9 +289,31 @@ func Filter_Catering() (tools.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT catering.id_catering, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan_catering, foto_profil_catering,rating,longtitude,langtitude,radius FROM catering JOIN maps m on catering.id_catering = m.id_catering"
+	sqlStatement := ""
 
 	rows, err := con.Query(sqlStatement)
+
+	if tipe == 1 {
+		sqlStatement = "SELECT catering.id_catering, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan_catering, foto_profil_catering,rating,longtitude,langtitude,radius FROM catering JOIN maps m on catering.id_catering = m.id_catering ORDER BY rating DESC "
+
+		rows, err = con.Query(sqlStatement)
+	} else if tipe == 2 {
+		sqlStatement = "SELECT c.id_catering, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan_catering, foto_profil_catering,rating,longtitude,langtitude,radius FROM favorite_catering JOIN catering c on c.id_catering = favorite_catering.id_catering JOIN maps m on favorite_catering.id_catering = m.id_catering WHERE favorite_catering.id_user=? ORDER BY favorite_catering.co ASC"
+
+		rows, err = con.Query(sqlStatement, id_user)
+	} else if tipe == 3 {
+		sqlStatement = "SELECT catering.id_catering, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan_catering, foto_profil_catering,rating,longtitude,langtitude,radius FROM catering JOIN maps m on catering.id_catering = m.id_catering WHERE tipe_pemesanan_catering LIKE '%Harian%' ORDER BY catering.co"
+
+		rows, err = con.Query(sqlStatement)
+	} else if tipe == 4 {
+		sqlStatement = "SELECT catering.id_catering, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan_catering, foto_profil_catering,rating,longtitude,langtitude,radius FROM catering JOIN maps m on catering.id_catering = m.id_catering WHERE tipe_pemesanan_catering LIKE '%Mingguan%' ORDER BY catering.co"
+
+		rows, err = con.Query(sqlStatement)
+	} else if tipe == 5 {
+		sqlStatement = "SELECT catering.id_catering, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan_catering, foto_profil_catering,rating,longtitude,langtitude,radius FROM catering JOIN maps m on catering.id_catering = m.id_catering WHERE tipe_pemesanan_catering LIKE '%Bulanan%' ORDER BY catering.co ASC"
+
+		rows, err = con.Query(sqlStatement)
+	}
 
 	defer rows.Close()
 
@@ -305,6 +334,7 @@ func Filter_Catering() (tools.Response, error) {
 	}
 
 	if arr == nil {
+		arr = append(arr, obj)
 		res.Status = http.StatusNotFound
 		res.Message = "Not Found"
 		res.Data = arr

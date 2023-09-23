@@ -4,6 +4,7 @@ import (
 	"KevinCatering/models"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"strconv"
 )
 
 //InputCatering
@@ -73,6 +74,22 @@ func GetQRCatering(c echo.Context) error {
 	id_catering := c.FormValue("id_catering")
 
 	result, err := models.Get_QR_Catering(id_catering)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+//Filter Catering
+func FilterCatering(c echo.Context) error {
+	tipe := c.FormValue("tipe")
+	id_user := c.FormValue("id_user")
+
+	tp, _ := strconv.Atoi(tipe)
+
+	result, err := models.Filter_Catering(tp, id_user)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

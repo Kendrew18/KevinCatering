@@ -3,10 +3,11 @@ package Rating
 import (
 	"KevinCatering/db"
 	"KevinCatering/tools"
+	"net/http"
 	"strconv"
 )
 
-func Input_Rating(id_detail_order string, id_catering string, rating int) (tools.Response, error) {
+func Input_Rating(id_detail_order string, id_catering string, rating int, review string) (tools.Response, error) {
 	var res tools.Response
 	var avg float64
 
@@ -22,7 +23,7 @@ func Input_Rating(id_detail_order string, id_catering string, rating int) (tools
 
 	id_RT := "RT-" + strconv.Itoa(nm_str)
 
-	Sqlstatement = "INSERT INTO rating (co, id_rating, id_detail_order, id_catering, rating) values(?,?,?,?,?)"
+	Sqlstatement = "INSERT INTO rating (co, id_rating, id_detail_order, id_catering, rating, review) values(?,?,?,?,?,?)"
 
 	stmt, err := con.Prepare(Sqlstatement)
 
@@ -30,7 +31,7 @@ func Input_Rating(id_detail_order string, id_catering string, rating int) (tools
 		return res, err
 	}
 
-	_, err = stmt.Exec(nm_str, id_RT, id_detail_order, id_catering, rating)
+	_, err = stmt.Exec(nm_str, id_RT, id_detail_order, id_catering, rating, review)
 
 	if err != nil {
 		return res, err
@@ -59,6 +60,9 @@ func Input_Rating(id_detail_order string, id_catering string, rating int) (tools
 	}
 
 	stmt.Close()
+
+	res.Status = http.StatusOK
+	res.Message = "Sukses"
 
 	return res, nil
 }

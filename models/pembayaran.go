@@ -21,20 +21,38 @@ func Read_Order_Recipe(id string, tanggal_recipe string) (tools.Response, error)
 
 	sqlStatement := ""
 
-	date_recipe, _ := time.Parse("02-01-2006", tanggal_recipe)
-	date_recipe_sql := date_recipe.Format("2006-01-02")
+	rows, err := con.Query(sqlStatement)
 
-	if strings.HasPrefix(id, "US") {
-		sqlStatement = "SELECT id_order, nama_catering,DATE_FORMAT(tanggal_order, '%d-%m-%Y') FROM order_catering JOIN catering c on order_catering.id_catering = c.id_catering WHERE order_catering.id_user=? && tanggal_order=?"
-	} else if strings.HasPrefix(id, "CT") {
-		sqlStatement = "SELECT id_order, nama_catering,DATE_FORMAT(tanggal_order, '%d-%m-%Y') FROM order_catering JOIN catering c on order_catering.id_catering = c.id_catering WHERE order_catering.id_catering=? && tanggal_order=?"
+	if tanggal_recipe != "" {
+
+		date_recipe, _ := time.Parse("02-01-2006", tanggal_recipe)
+		date_recipe_sql := date_recipe.Format("2006-01-02")
+
+		if strings.HasPrefix(id, "US") {
+			sqlStatement = "SELECT id_order, nama_catering,DATE_FORMAT(tanggal_order, '%d-%m-%Y') FROM order_catering JOIN catering c on order_catering.id_catering = c.id_catering WHERE order_catering.id_user=? && tanggal_order=? ORDER BY tanggal_order DESC "
+		} else if strings.HasPrefix(id, "CT") {
+			sqlStatement = "SELECT id_order, nama_catering,DATE_FORMAT(tanggal_order, '%d-%m-%Y') FROM order_catering JOIN catering c on order_catering.id_catering = c.id_catering WHERE order_catering.id_catering=? && tanggal_order=? ORDER BY tanggal_order DESC"
+		} else {
+			res.Status = http.StatusNotFound
+			res.Message = "Not Found"
+			res.Data = arr
+		}
+
+		rows, err = con.Query(sqlStatement, id, date_recipe_sql)
 	} else {
-		res.Status = http.StatusNotFound
-		res.Message = "Not Found"
-		res.Data = arr
-	}
 
-	rows, err := con.Query(sqlStatement, id, date_recipe_sql)
+		if strings.HasPrefix(id, "US") {
+			sqlStatement = "SELECT id_order, nama_catering,DATE_FORMAT(tanggal_order, '%d-%m-%Y') FROM order_catering JOIN catering c on order_catering.id_catering = c.id_catering WHERE order_catering.id_user=? ORDER BY tanggal_order DESC"
+		} else if strings.HasPrefix(id, "CT") {
+			sqlStatement = "SELECT id_order, nama_catering,DATE_FORMAT(tanggal_order, '%d-%m-%Y') FROM order_catering JOIN catering c on order_catering.id_catering = c.id_catering WHERE order_catering.id_catering=? ORDER BY tanggal_order DESC"
+		} else {
+			res.Status = http.StatusNotFound
+			res.Message = "Not Found"
+			res.Data = arr
+		}
+
+		rows, err = con.Query(sqlStatement, id)
+	}
 
 	defer rows.Close()
 

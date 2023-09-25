@@ -295,6 +295,8 @@ func Filter_Catering(tipe int, id_user string) (tools.Response, error) {
 
 	if tipe == 0 {
 		sqlStatement = "SELECT catering.id_catering, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan_catering, foto_profil_catering,rating,longtitude,langtitude,radius FROM catering JOIN maps m on catering.id_catering = m.id_catering"
+
+		rows, err = con.Query(sqlStatement)
 	} else if tipe == 1 {
 		sqlStatement = "SELECT catering.id_catering, nama_catering, alamat_catering, telp_catering, email_catering, deskripsi_catering, tipe_pemesanan_catering, foto_profil_catering,rating,longtitude,langtitude,radius FROM catering JOIN maps m on catering.id_catering = m.id_catering ORDER BY rating DESC "
 

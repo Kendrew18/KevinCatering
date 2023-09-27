@@ -3,6 +3,7 @@ package routes
 import (
 	"KevinCatering/controllers"
 	"KevinCatering/controllers/Favorite_Catering"
+	"KevinCatering/controllers/Notif"
 	"KevinCatering/controllers/Rating"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -28,6 +29,7 @@ func Init() *echo.Echo {
 	BD := e.Group("/BD")
 	RL := e.Group("/RL")
 	RT := e.Group("/RT")
+	NTF := e.Group("/NTF")
 
 	//user
 	//Sign_UP
@@ -99,8 +101,11 @@ func Init() *echo.Echo {
 	PBR.GET("/read-recipe-order", controllers.ReadOrderRecipe)
 	//Read_Detail_Rescipe_order
 	PBR.GET("/read-detail-rescipe-order", controllers.ReadDetailOrderRecipe)
-	//Read_Notif_Pembayaran
-	PBR.GET("/read-notif-pembayaran", controllers.NotifPembayaran)
+
+	//Notif
+	NTF.GET("/show-all-notif", Notif.ShowAllNotif)
+	//Read_Detail_Notif
+	NTF.GET("/read-detail-notif", Notif.ReadDetailNotif)
 
 	//foto
 	//get image foto

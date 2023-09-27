@@ -59,19 +59,6 @@ func ConfirmPembayaran(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-//Notif Pembayaran
-func NotifPembayaran(c echo.Context) error {
-	id_order := c.FormValue("id_order")
-
-	result, err := models.Read_Notif(id_order)
-
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
-	}
-
-	return c.JSON(http.StatusOK, result)
-}
-
 func ReadFoto(c echo.Context) error {
 	path := c.FormValue("path")
 	return c.File(path)

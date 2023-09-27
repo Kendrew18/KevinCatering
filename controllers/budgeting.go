@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-//InputCatering
+//Input_Budgeting
 func InputBudgeting(c echo.Context) error {
 	id_catering := c.FormValue("id_catering")
 	nama_menu := c.FormValue("nama_menu")
@@ -30,7 +30,7 @@ func InputBudgeting(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-//Read_Profile_Catering
+//Read_Awal_Budgeting
 func ReadAwalBudgeting(c echo.Context) error {
 	id_catering := c.FormValue("id_catering")
 
@@ -43,7 +43,7 @@ func ReadAwalBudgeting(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-//Read_Catering
+//Read_Budgeting
 func ReadBudgeting(c echo.Context) error {
 	id_budgeting := c.FormValue("id_budgeting")
 

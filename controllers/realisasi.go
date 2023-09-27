@@ -7,6 +7,7 @@ import (
 	"strconv"
 )
 
+//Input Realisasi
 func InputRealisasi(c echo.Context) error {
 	id_bahan_menu := c.FormValue("id_bahan_menu")
 	keterangan := c.FormValue("keteranagn")
@@ -25,6 +26,7 @@ func InputRealisasi(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
+//Read Realisasi
 func ReadRealisasi(c echo.Context) error {
 	id_bahan_menu := c.FormValue("id_bahan_menu")
 

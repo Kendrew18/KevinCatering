@@ -9,37 +9,48 @@ import (
 
 func Input_Favorite_Catering(id_user string, id_catering string) (tools.Response, error) {
 	var res tools.Response
+	var id_favorite_catering string
 
 	con := db.CreateCon()
 
-	nm_str := 0
+	Sqlstatement := "SELECT id_favorite_catering FROM favorite_catering WHERE id_user=? && id_catering=?"
 
-	Sqlstatement := "SELECT co FROM favorite_catering ORDER BY co DESC Limit 1"
+	_ = con.QueryRow(Sqlstatement, id_catering, id_user).Scan(&id_favorite_catering)
 
-	_ = con.QueryRow(Sqlstatement).Scan(&nm_str)
+	if id_favorite_catering == "" {
 
-	nm_str = nm_str + 1
+		nm_str := 0
 
-	id_F_C := "FC-" + strconv.Itoa(nm_str)
+		Sqlstatement := "SELECT co FROM favorite_catering ORDER BY co DESC Limit 1"
 
-	Sqlstatement = "INSERT INTO favorite_catering (co, id_favorite_catering, id_user, id_catering) values(?,?,?,?)"
+		_ = con.QueryRow(Sqlstatement).Scan(&nm_str)
 
-	stmt, err := con.Prepare(Sqlstatement)
+		nm_str = nm_str + 1
 
-	if err != nil {
-		return res, err
+		id_F_C := "FC-" + strconv.Itoa(nm_str)
+
+		Sqlstatement = "INSERT INTO favorite_catering (co, id_favorite_catering, id_user, id_catering) values(?,?,?,?)"
+
+		stmt, err := con.Prepare(Sqlstatement)
+
+		if err != nil {
+			return res, err
+		}
+
+		_, err = stmt.Exec(nm_str, id_F_C, id_user, id_catering)
+
+		if err != nil {
+			return res, err
+		}
+
+		stmt.Close()
+
+		res.Status = http.StatusOK
+		res.Message = "Sukses"
+	} else {
+		res.Status = http.StatusNotFound
+		res.Message = "Sudah Terdaftar Sebagai Favorite"
 	}
-
-	_, err = stmt.Exec(nm_str, id_F_C, id_user, id_catering)
-
-	if err != nil {
-		return res, err
-	}
-
-	stmt.Close()
-
-	res.Status = http.StatusOK
-	res.Message = "Sukses"
 
 	return res, nil
 }

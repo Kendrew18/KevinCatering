@@ -15,7 +15,7 @@ func Input_Favorite_Catering(id_user string, id_catering string) (tools.Response
 
 	Sqlstatement := "SELECT id_favorite_catering FROM favorite_catering WHERE id_user=? && id_catering=?"
 
-	_ = con.QueryRow(Sqlstatement, id_catering, id_user).Scan(&id_favorite_catering)
+	_ = con.QueryRow(Sqlstatement, id_user, id_catering).Scan(&id_favorite_catering)
 
 	if id_favorite_catering == "" {
 

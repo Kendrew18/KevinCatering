@@ -470,7 +470,7 @@ func History_Order(id_user string) (tools.Response, error) {
 			return res, err
 		}
 
-		sqlStatement2 := "SELECT detail_order.id_order, id_detail_order, oc.id_catering,c.nama_catering, nama_menu, harga_menu, status_order  FROM detail_order JOIN order_catering oc on detail_order.id_order = oc.id_order JOIN catering c on c.id_catering = oc.id_catering"
+		sqlStatement2 := "SELECT detail_order.id_order, id_detail_order, oc.id_catering,c.nama_catering, nama_menu, harga_menu, status_order, r.rating FROM detail_order JOIN order_catering oc on detail_order.id_order = oc.id_order JOIN catering c on c.id_catering = oc.id_catering JOIN rating r on detail_order.id_detail_order = r.id_detail_order"
 
 		sqlStatement2 = sqlStatement2 + q1 + q3
 

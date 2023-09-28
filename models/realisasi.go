@@ -9,7 +9,7 @@ import (
 )
 
 //Input_Realisasi
-func Input_Realisasi(id_bahan_menu string, keterangan string, jumlah_bahan int, harga_bahan int) (tools.Response, error) {
+func Input_Realisasi(id_bahan_menu string, keterangan string, jumlah_bahan float64, harga_bahan int) (tools.Response, error) {
 	var res tools.Response
 
 	con := db.CreateCon()
@@ -33,6 +33,10 @@ func Input_Realisasi(id_bahan_menu string, keterangan string, jumlah_bahan int, 
 	}
 
 	_, err = stmt.Exec(nm_str, id_RL, id_bahan_menu, keterangan, harga_bahan, jumlah_bahan)
+
+	if err != nil {
+		return res, err
+	}
 
 	stmt.Close()
 

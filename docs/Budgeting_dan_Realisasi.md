@@ -36,3 +36,26 @@ Method: GET
 Controllers:
 
     id_budgeting := c.FormValue("id_budgeting")
+
+##  Input Budgeting (APK catering)
+
+Link: kostsoda.onthewifi.com:3333/RL/input-realisasi
+
+Method: POST
+
+Controllers:
+
+    id_bahan_menu := c.FormValue("id_bahan_menu")
+	keterangan := c.FormValue("keterangan")
+	jumlah := c.FormValue("jumlah")
+	harga := c.FormValue("harga")
+
+##  Read Awal Budgeting (APK catering)
+
+Link: kostsoda.onthewifi.com:3333/RL/read-realisasi
+
+Method: GET
+
+Controllers:
+
+    id_bahan_menu := c.FormValue("id_bahan_menu")

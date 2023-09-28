@@ -1,6 +1,6 @@
-# How TO Use API Notif
+# How TO Use API Menu
 __________ 
-##  Show All Notif
+##  Edit Menu
 
 Method: PUT
 

@@ -10,11 +10,11 @@ import (
 //Input Realisasi
 func InputRealisasi(c echo.Context) error {
 	id_bahan_menu := c.FormValue("id_bahan_menu")
-	keterangan := c.FormValue("keteranagn")
+	keterangan := c.FormValue("keterangan")
 	jumlah := c.FormValue("jumlah")
 	harga := c.FormValue("harga")
 
-	jmlh, _ := strconv.Atoi(jumlah)
+	jmlh, _ := strconv.ParseFloat(jumlah, 64)
 	hrg, _ := strconv.Atoi(harga)
 
 	result, err := models.Input_Realisasi(id_bahan_menu, keterangan, jmlh, hrg)

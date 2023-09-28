@@ -38,7 +38,7 @@ func Input_Budgeting(id_catering string, nama_menu string, total_porsi int, tang
 	_, err = stmt.Exec(nm_str, id_BD, id_catering, nama_menu, total_porsi, date_sql)
 
 	nama_bahan_SS := tools.String_Separator_To_String(nama_bahan)
-	jumlah_bahan_SS := tools.String_Separator_To_Int(jumlah_bahan)
+	jumlah_bahan_SS := tools.String_Separator_To_float64(jumlah_bahan)
 	satuan_bahan_SS := tools.String_Separator_To_String(satuan_bahan)
 	harga_bahan_SS := tools.String_Separator_To_Int64(harga_bahan)
 
@@ -61,8 +61,11 @@ func Input_Budgeting(id_catering string, nama_menu string, total_porsi int, tang
 			return res, err
 		}
 
-		_, err = stmt_BHN.Exec(nm_str_BHN, id_BHN, id_BD, nama_bahan_SS[i], jumlah_bahan_SS[i], satuan_bahan_SS[i], harga_bahan_SS[i], harga_bahan_SS[i])
+		_, err = stmt_BHN.Exec(nm_str_BHN, id_BHN, id_BD, nama_bahan_SS[i], jumlah_bahan_SS[i], satuan_bahan_SS[i], harga_bahan_SS[i])
 
+		if err != nil {
+			return res, err
+		}
 	}
 
 	stmt.Close()
@@ -148,6 +151,8 @@ func Read_Budgeting(id_budgeting string) (tools.Response, error) {
 		}
 		arr_bahan = append(arr_bahan, bahan)
 	}
+
+	obj.Bahan = arr_bahan
 
 	arr = append(arr, obj)
 

@@ -2,6 +2,7 @@ package models
 
 import (
 	"KevinCatering/db"
+	_struct "KevinCatering/struct"
 	"KevinCatering/struct/Order"
 	"KevinCatering/tools"
 	"fmt"
@@ -542,6 +543,110 @@ func History_Order(id_user string) (tools.Response, error) {
 		res.Status = http.StatusOK
 		res.Message = "Sukses"
 		res.Data = arr_order_menu_fix
+	}
+
+	return res, nil
+}
+
+//Read Order Pengantar
+func Read_Order_Pengantar(id_pengantar string) (tools.Response, error) {
+	var res tools.Response
+	var arr_order_menu_fix []Order.Read_Menu_Order
+	var obj_order_menu_fix Order.Read_Menu_Order
+
+	var arr_order_menu []Order.Menu_Order_Dipesan
+	var obj_order_menu Order.Menu_Order_Dipesan
+
+	con := db.CreateCon()
+
+	sqlStatement := "SELECT DISTINCT(detail_order.tanggal_menu) FROM detail_order WHERE id_pengantar=?"
+
+	rows, err := con.Query(sqlStatement, id_pengantar)
+
+	defer rows.Close()
+
+	if err != nil {
+		return res, err
+	}
+
+	for rows.Next() {
+		err = rows.Scan(&obj_order_menu_fix.Tanggal_menu)
+
+		if err != nil {
+			return res, err
+		}
+
+		sqlStatement2 := "SELECT detail_order.id_order, id_detail_order, oc.id_catering,c.nama_catering,id_pengantar, nama_menu, harga_menu, status_order, radius, m.longtitude, m.langtitude  FROM detail_order JOIN order_catering oc on detail_order.id_order = oc.id_order JOIN catering c on c.id_catering = oc.id_catering JOIN maps m on c.id_catering = m.id_catering WHERE detail_order.id_pengantar=? && tanggal_menu=? && status_order=?"
+
+		rows2, err := con.Query(sqlStatement2, id_pengantar, obj_order_menu_fix.Tanggal_menu, "On Delivery")
+
+		defer rows2.Close()
+
+		if err != nil {
+			return res, err
+		}
+
+		for rows2.Next() {
+			err = rows2.Scan(&obj_order_menu.Id_order, &obj_order_menu.Id_detail_order, &obj_order_menu.Id_catering, &obj_order_menu.Nama_catering, &obj_order_menu.Id_pengantar, &obj_order_menu.Nama_menu, &obj_order_menu.Harga_menu, &obj_order_menu.Status_order, &obj_order_menu.Radius, &obj_order_menu.Longtitude, &obj_order_menu.Langtitude)
+
+			if err != nil {
+				return res, err
+			}
+
+			arr_order_menu = append(arr_order_menu, obj_order_menu)
+		}
+		obj_order_menu_fix.Menu_Order_Dipesan = arr_order_menu
+
+		tanggal, _ := time.Parse("2006-01-02", obj_order_menu_fix.Tanggal_menu)
+		obj_order_menu_fix.Tanggal_menu = tanggal.Format("02-01-2006")
+
+		arr_order_menu_fix = append(arr_order_menu_fix, obj_order_menu_fix)
+	}
+
+	if arr_order_menu_fix == nil {
+		res.Status = http.StatusNotFound
+		res.Message = "Not Found"
+		res.Data = arr_order_menu_fix
+	} else {
+		res.Status = http.StatusOK
+		res.Message = "Sukses"
+		res.Data = arr_order_menu_fix
+	}
+
+	return res, nil
+}
+
+//Read Location User
+func Read_Location_User(id_detail_order string) (tools.Response, error) {
+	var res tools.Response
+	var arr []_struct.Read_Long_Lang
+	var obj _struct.Read_Long_Lang
+
+	con := db.CreateCon()
+
+	sqlStatement := "SELECT oc.longtitude,oc.langtitude FROM detail_order JOIN order_catering oc on oc.id_order = detail_order.id_order WHERE id_detail_order=?"
+
+	err := con.QueryRow(sqlStatement, id_detail_order).Scan(&obj.Longitude, &obj.Langitude)
+
+	if err != nil {
+		arr = append(arr, obj)
+		res.Status = http.StatusNotFound
+		res.Message = "Not Found"
+		res.Data = arr
+
+		return res, nil
+	}
+
+	arr = append(arr, obj)
+
+	if arr == nil {
+		res.Status = http.StatusNotFound
+		res.Message = "Not Found"
+		res.Data = arr
+	} else {
+		res.Status = http.StatusOK
+		res.Message = "Sukses"
+		res.Data = arr
 	}
 
 	return res, nil

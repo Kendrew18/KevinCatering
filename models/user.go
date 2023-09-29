@@ -71,6 +71,7 @@ func Login(username string, password string) (tools.Response, error) {
 	err := con.QueryRow(sqlStatement, username, password).Scan(&arr.Id_user, &arr.Status_user)
 
 	if arr.Status_user == 2 {
+
 		fmt.Println(arr.Id_user)
 		sqlStatement := "SELECT id_catering FROM catering WHERE id_user=?"
 
@@ -79,6 +80,18 @@ func Login(username string, password string) (tools.Response, error) {
 		if err != nil {
 			return res, err
 		}
+
+	} else if arr.Status_user == 3 {
+
+		fmt.Println(arr.Id_user)
+		sqlStatement := "SELECT id_pengantar FROM pengantar WHERE id_user=?"
+
+		err = con.QueryRow(sqlStatement, arr.Id_user).Scan(&arr.Id_pengantar)
+
+		if err != nil {
+			return res, err
+		}
+
 	}
 
 	if err != nil || arr.Id_user == "" {
@@ -139,8 +152,7 @@ func Read_Profile(id_user string) (tools.Response, error) {
 }
 
 //edit profile
-func Edit_Profile(id_user string, nama_user string, telp_user string,
-	email_user string) (tools.Response, error) {
+func Edit_Profile(id_user string, nama_user string, telp_user string, email_user string) (tools.Response, error) {
 	var res tools.Response
 
 	con := db.CreateCon()

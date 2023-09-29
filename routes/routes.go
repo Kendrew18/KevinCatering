@@ -91,6 +91,10 @@ func Init() *echo.Echo {
 	ORD.GET("/order-detail-user", controllers.OrderDetailUser)
 	//History_Order
 	ORD.GET("/history-order", controllers.HistoryOrder)
+	//Read Order Pengantar
+	ORD.GET("/read-order-pengantar", controllers.ReadOrderMenuPengantar)
+	//Read Location User
+	ORD.GET("/read-location-user", controllers.ReadLocationUser)
 
 	//Pembayaran
 	//Read_Pembayaran

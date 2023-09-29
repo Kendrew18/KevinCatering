@@ -86,10 +86,37 @@ func OrderDetailUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
+//History Order
 func HistoryOrder(c echo.Context) error {
 	id_user := c.FormValue("id_user")
 
 	result, err := models.History_Order(id_user)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+//Read Order Menu Pengantar
+func ReadOrderMenuPengantar(c echo.Context) error {
+	id_pengantar := c.FormValue("id_pengantar")
+
+	result, err := models.Read_Order_Pengantar(id_pengantar)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+// Read Location User
+func ReadLocationUser(c echo.Context) error {
+	id_detail_order := c.FormValue("id_detail_order")
+
+	result, err := models.Read_Location_User(id_detail_order)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

@@ -9,9 +9,7 @@ import (
 	"strconv"
 )
 
-func Sign_Up_Pengantar(id_catering string, nama_user string, telp_user string, email_user string,
-	username_user string, password_user string,
-	status_user int) (tools.Response, error) {
+func Sign_Up_Pengantar(id_catering string, nama_user string, telp_user string, email_user string, username_user string, password_user string, status_user int) (tools.Response, error) {
 	var res tools.Response
 
 	con := db.CreateCon()
@@ -107,7 +105,7 @@ func Update_Maps(id_user string, langtitude float64, longtitude float64) (tools.
 
 	con := db.CreateCon()
 
-	sqlstatement := "UPDATE pengantar SET longtitude=?,langtitude=? WHERE id_user=?"
+	sqlstatement := "UPDATE pengantar SET longtitude=?,langtitude=? WHERE id_pengantar=?"
 
 	stmt, err := con.Prepare(sqlstatement)
 
@@ -127,7 +125,7 @@ func Update_Maps(id_user string, langtitude float64, longtitude float64) (tools.
 	return res, nil
 }
 
-func Read_Maps_Pengantar(id_user string) (tools.Response, error) {
+func Read_Maps_Pengantar(id_pengantar string) (tools.Response, error) {
 	var res tools.Response
 	var maps Maps.Read_Maps_Pengantar
 	var maps_arr []Maps.Read_Maps_Pengantar
@@ -136,7 +134,7 @@ func Read_Maps_Pengantar(id_user string) (tools.Response, error) {
 
 	sqlstatement := "SELECT longtitude, langtitude FROM pengantar WHERE id_user=?"
 
-	err := con.QueryRow(sqlstatement, id_user).Scan(&maps.Longtitude, &maps.Langtitude)
+	err := con.QueryRow(sqlstatement, id_pengantar).Scan(&maps.Longtitude, &maps.Langtitude)
 
 	if err != nil {
 		return res, err

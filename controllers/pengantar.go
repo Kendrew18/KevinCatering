@@ -41,14 +41,14 @@ func ReadPengantar(c echo.Context) error {
 }
 
 func UpdateMaps(c echo.Context) error {
-	id_user := c.FormValue("id_user")
+	id_pengantar := c.FormValue("id_pengantar")
 	langtitude := c.FormValue("langtitude")
 	longtitude := c.FormValue("longtitude")
 
 	long, _ := strconv.ParseFloat(longtitude, 64)
 	lang, _ := strconv.ParseFloat(langtitude, 64)
 
-	result, err := models.Update_Maps(id_user, lang, long)
+	result, err := models.Update_Maps(id_pengantar, lang, long)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
@@ -58,9 +58,9 @@ func UpdateMaps(c echo.Context) error {
 }
 
 func ReadMapsPengantar(c echo.Context) error {
-	id_user := c.FormValue("id_user")
+	id_pengantar := c.FormValue("id_pengantar")
 
-	result, err := models.Read_Maps_Pengantar(id_user)
+	result, err := models.Read_Maps_Pengantar(id_pengantar)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

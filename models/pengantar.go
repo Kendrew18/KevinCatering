@@ -132,7 +132,7 @@ func Read_Maps_Pengantar(id_pengantar string) (tools.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlstatement := "SELECT longtitude, langtitude FROM pengantar WHERE id_user=?"
+	sqlstatement := "SELECT longtitude, langtitude FROM pengantar WHERE id_pengantar=?"
 
 	err := con.QueryRow(sqlstatement, id_pengantar).Scan(&maps.Longtitude, &maps.Langtitude)
 

@@ -161,6 +161,20 @@ func Confirm_Pembayaran(id_order string) (tools.Response, error) {
 
 	err = con.QueryRow(sqlstatement, id_order).Scan(&Read_Pembayaran_Fix.Id_pembayaran, &Read_Pembayaran_Fix.Id_order, &Read_Pembayaran_Fix.Status_pembayaran)
 
+	sqlstatement = "DELETE FROM notif WHERE id_order=?"
+
+	stmt, err = con.Prepare(sqlstatement)
+
+	if err != nil {
+		return res, err
+	}
+
+	_, err = stmt.Exec(id_order)
+
+	if err != nil {
+		return res, err
+	}
+
 	res.Status = http.StatusOK
 	res.Message = "Suksess"
 	res.Data = Read_Pembayaran_Fix

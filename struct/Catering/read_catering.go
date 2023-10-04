@@ -13,4 +13,5 @@ type Read_Catering struct {
 	Longtitude           string   `json:"longtitude"`
 	Langtitude           string   `json:"langtitude"`
 	Radius               int      `json:"radius"`
+	Favorite             int      `json:"favorite"`
 }

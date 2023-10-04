@@ -2,6 +2,7 @@ package Rating
 
 import (
 	"KevinCatering/db"
+	"KevinCatering/struct/Rating"
 	"KevinCatering/tools"
 	"net/http"
 	"strconv"
@@ -10,6 +11,7 @@ import (
 func Input_Rating(id_detail_order string, id_catering string, rating int, review string) (tools.Response, error) {
 	var res tools.Response
 	var avg float64
+	var rt Rating.Rating
 
 	con := db.CreateCon()
 
@@ -61,8 +63,16 @@ func Input_Rating(id_detail_order string, id_catering string, rating int, review
 
 	stmt.Close()
 
+	sqlstatement = "SELECT id_rating, rating, review FROM rating ORDER BY co DESC LIMIT 1"
+	err = con.QueryRow(sqlstatement).Scan(&rt.Id_rating, &rt.Rating, &rt.Review)
+
+	if err != nil {
+		return res, err
+	}
+
 	res.Status = http.StatusOK
 	res.Message = "Sukses"
+	res.Data = rt
 
 	return res, nil
 }

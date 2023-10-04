@@ -330,6 +330,18 @@ func Filter_Catering(tipe int, id_user string) (tools.Response, error) {
 			&obj.Telp_catering, &obj.Email_catering, &obj.Deskripsi_catering,
 			&obj_c.Tipe_catering, &obj.Foto_profil_catering, &obj.Rating,
 			&obj.Longtitude, &obj.Langtitude, &obj.Radius)
+
+		id_favorite := ""
+		sqlstatement := "SELECT id_favorite_catering FROM favorite_catering WHERE id_catering=? && id_user=?"
+
+		_ = con.QueryRow(sqlstatement, obj.Id_catering, id_user).Scan(&id_favorite)
+
+		if id_favorite == "" {
+			obj.Favorite = 0
+		} else {
+			obj.Favorite = 1
+		}
+
 		obj.Tipe_pemesanan = tools.String_Separator_To_String(obj_c.Tipe_catering)
 		if err != nil {
 			return res, err

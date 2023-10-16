@@ -283,7 +283,7 @@ func Confirm_Order(id string, id_detail_order string) (tools.Response, error) {
 }
 
 //Show order / menu / tanggal
-func Show_Order_Menu(id string) (tools.Response, error) {
+func Show_Order_Menu(id string, tanggal_menu string) (tools.Response, error) {
 	var res tools.Response
 	var arr []Order.Read_Id_Order
 	var obj Order.Read_Id_Order
@@ -324,42 +324,95 @@ func Show_Order_Menu(id string) (tools.Response, error) {
 	}
 
 	if arr != nil {
+		if tanggal_menu == "" {
 
-		q1 := " WHERE detail_order.id_order IN ("
-		q2 := "ORDER BY tanggal_menu ASC"
-		q3 := " && tanggal_menu=?"
-		sqlStatement = "SELECT DISTINCT(detail_order.tanggal_menu) FROM detail_order"
+			q1 := " WHERE detail_order.id_order IN ("
+			q2 := "ORDER BY tanggal_menu ASC"
+			q3 := " && tanggal_menu=?"
+			sqlStatement = "SELECT DISTINCT(detail_order.tanggal_menu) FROM detail_order"
 
-		for i := 0; i < len(arr); i++ {
-			if i == len(arr)-1 {
-				q1 = q1 + "'" + arr[i].Id_Order + "') && status_order != 'Complate' "
-			} else {
-				q1 = q1 + "'" + arr[i].Id_Order + "' , "
+			for i := 0; i < len(arr); i++ {
+				if i == len(arr)-1 {
+					q1 = q1 + "'" + arr[i].Id_Order + "') && status_order != 'Complate' "
+				} else {
+					q1 = q1 + "'" + arr[i].Id_Order + "' , "
+				}
 			}
-		}
 
-		sqlStatement = sqlStatement + q1 + q2
+			sqlStatement = sqlStatement + q1 + q2
 
-		rows, err = con.Query(sqlStatement)
+			rows, err = con.Query(sqlStatement)
 
-		defer rows.Close()
-
-		if err != nil {
-			return res, err
-		}
-
-		for rows.Next() {
-			err = rows.Scan(&obj_order_menu_fix.Tanggal_menu)
+			defer rows.Close()
 
 			if err != nil {
 				return res, err
 			}
 
+			for rows.Next() {
+				err = rows.Scan(&obj_order_menu_fix.Tanggal_menu)
+
+				if err != nil {
+					return res, err
+				}
+
+				sqlStatement2 := "SELECT detail_order.id_order, id_detail_order, oc.id_catering,c.nama_catering,id_pengantar, nama_menu, harga_menu, status_order, radius, m.longtitude, m.langtitude  FROM detail_order JOIN order_catering oc on detail_order.id_order = oc.id_order JOIN catering c on c.id_catering = oc.id_catering JOIN maps m on c.id_catering = m.id_catering"
+
+				sqlStatement2 = sqlStatement2 + q1 + q3
+
+				rows2, err := con.Query(sqlStatement2, obj_order_menu_fix.Tanggal_menu)
+
+				defer rows2.Close()
+
+				if err != nil {
+					return res, err
+				}
+
+				for rows2.Next() {
+					err = rows2.Scan(&obj_order_menu.Id_order, &obj_order_menu.Id_detail_order, &obj_order_menu.Id_catering, &obj_order_menu.Nama_catering, &obj_order_menu.Id_pengantar, &obj_order_menu.Nama_menu, &obj_order_menu.Harga_menu, &obj_order_menu.Status_order, &obj_order_menu.Radius, &obj_order_menu.Longtitude, &obj_order_menu.Langtitude)
+
+					if err != nil {
+						return res, err
+					}
+
+					arr_order_menu = append(arr_order_menu, obj_order_menu)
+				}
+				obj_order_menu_fix.Menu_Order_Dipesan = arr_order_menu
+
+				arr_order_menu_fix = append(arr_order_menu_fix, obj_order_menu_fix)
+			}
+
+			if arr_order_menu_fix == nil {
+				res.Status = http.StatusNotFound
+				res.Message = "Not Found"
+				res.Data = arr_order_menu_fix
+			} else {
+				res.Status = http.StatusOK
+				res.Message = "Sukses"
+				res.Data = arr_order_menu_fix
+			}
+		} else {
+			q1 := " WHERE detail_order.id_order IN ("
+			q3 := " && tanggal_menu=?"
+
+			for i := 0; i < len(arr); i++ {
+				if i == len(arr)-1 {
+					q1 = q1 + "'" + arr[i].Id_Order + "') && status_order != 'Complate' "
+				} else {
+					q1 = q1 + "'" + arr[i].Id_Order + "' , "
+				}
+			}
+
+			obj_order_menu_fix.Tanggal_menu = tanggal_menu
+
+			date, _ := time.Parse("02-01-2006", tanggal_menu)
+			tanggal_menu_sql := date.Format("2006-01-02")
+
 			sqlStatement2 := "SELECT detail_order.id_order, id_detail_order, oc.id_catering,c.nama_catering,id_pengantar, nama_menu, harga_menu, status_order, radius, m.longtitude, m.langtitude  FROM detail_order JOIN order_catering oc on detail_order.id_order = oc.id_order JOIN catering c on c.id_catering = oc.id_catering JOIN maps m on c.id_catering = m.id_catering"
 
 			sqlStatement2 = sqlStatement2 + q1 + q3
 
-			rows2, err := con.Query(sqlStatement2, obj_order_menu_fix.Tanggal_menu)
+			rows2, err := con.Query(sqlStatement2, tanggal_menu_sql)
 
 			defer rows2.Close()
 
@@ -379,16 +432,16 @@ func Show_Order_Menu(id string) (tools.Response, error) {
 			obj_order_menu_fix.Menu_Order_Dipesan = arr_order_menu
 
 			arr_order_menu_fix = append(arr_order_menu_fix, obj_order_menu_fix)
-		}
 
-		if arr_order_menu_fix == nil {
-			res.Status = http.StatusNotFound
-			res.Message = "Not Found"
-			res.Data = arr_order_menu_fix
-		} else {
-			res.Status = http.StatusOK
-			res.Message = "Sukses"
-			res.Data = arr_order_menu_fix
+			if arr_order_menu_fix == nil {
+				res.Status = http.StatusNotFound
+				res.Message = "Not Found"
+				res.Data = arr_order_menu_fix
+			} else {
+				res.Status = http.StatusOK
+				res.Message = "Sukses"
+				res.Data = arr_order_menu_fix
+			}
 		}
 	} else {
 		res.Status = http.StatusNotFound
@@ -437,7 +490,7 @@ func Order_Detail_User(id_detail_order string) (tools.Response, error) {
 }
 
 //History Order
-func History_Order(id_user string) (tools.Response, error) {
+func History_Order(id_user string, tanggal_menu string) (tools.Response, error) {
 	var res tools.Response
 	var arr []Order.Read_Id_Order
 	var obj Order.Read_Id_Order
@@ -468,81 +521,151 @@ func History_Order(id_user string) (tools.Response, error) {
 		arr = append(arr, obj)
 	}
 
-	q1 := " WHERE detail_order.id_order IN ("
-	q2 := "ORDER BY tanggal_menu ASC"
-	q3 := " && tanggal_menu=?"
+	if arr != nil {
+		if tanggal_menu == "" {
+			q1 := " WHERE detail_order.id_order IN ("
+			q2 := "ORDER BY tanggal_menu ASC"
+			q3 := " && tanggal_menu=?"
 
-	sqlStatement = "SELECT DISTINCT(detail_order.tanggal_menu) FROM detail_order"
+			sqlStatement = "SELECT DISTINCT(detail_order.tanggal_menu) FROM detail_order"
 
-	for i := 0; i < len(arr); i++ {
-		if i == len(arr)-1 {
-			q1 = q1 + "'" + arr[i].Id_Order + "') && status_order = 'Complate' "
+			for i := 0; i < len(arr); i++ {
+				if i == len(arr)-1 {
+					q1 = q1 + "'" + arr[i].Id_Order + "') && status_order = 'Complate' "
+				} else {
+					q1 = q1 + "'" + arr[i].Id_Order + "' , "
+				}
+			}
+
+			sqlStatement = sqlStatement + q1 + q2
+
+			rows, err = con.Query(sqlStatement)
+
+			defer rows.Close()
+
+			if err != nil {
+				fmt.Println(sqlStatement)
+				return res, err
+			}
+
+			for rows.Next() {
+				err = rows.Scan(&obj_order_menu_fix.Tanggal_menu)
+
+				if err != nil {
+					return res, err
+				}
+
+				sqlStatement2 := "SELECT detail_order.id_order, id_detail_order, oc.id_catering,c.nama_catering, nama_menu, harga_menu, status_order FROM detail_order JOIN order_catering oc on detail_order.id_order = oc.id_order JOIN catering c on c.id_catering = oc.id_catering"
+
+				sqlStatement2 = sqlStatement2 + q1 + q3
+
+				rows2, err := con.Query(sqlStatement2, obj_order_menu_fix.Tanggal_menu)
+
+				defer rows2.Close()
+
+				if err != nil {
+					return res, err
+				}
+
+				for rows2.Next() {
+					err = rows2.Scan(&obj_order_his.Id_order, &obj_order_his.Id_detail_order, &obj_order_his.Id_catering, &obj_order_his.Nama_catering, &obj_order_his.Nama_menu, &obj_order_his.Harga_menu, &obj_order_his.Status_order)
+
+					if err != nil {
+						return res, err
+					}
+
+					sqlStatement_rating := "SELECT rating FROM rating WHERE id_detail_order=?"
+
+					err := con.QueryRow(sqlStatement_rating, obj_order_his.Id_detail_order).Scan(&obj_order_his.Rating)
+
+					if err != nil {
+						fmt.Println(err)
+						obj_order_his.Rating = 0
+					}
+
+					arr_order_his = append(arr_order_his, obj_order_his)
+				}
+				obj_order_menu_fix.History_Order = arr_order_his
+
+				arr_order_menu_fix = append(arr_order_menu_fix, obj_order_menu_fix)
+			}
+
+			if arr_order_menu_fix == nil {
+				res.Status = http.StatusNotFound
+				res.Message = "Not Found"
+				res.Data = arr_order_menu_fix
+			} else {
+				res.Status = http.StatusOK
+				res.Message = "Sukses"
+				res.Data = arr_order_menu_fix
+			}
 		} else {
-			q1 = q1 + "'" + arr[i].Id_Order + "' , "
-		}
-	}
 
-	sqlStatement = sqlStatement + q1 + q2
+			q1 := " WHERE detail_order.id_order IN ("
+			q3 := " && tanggal_menu=?"
 
-	rows, err = con.Query(sqlStatement)
+			for i := 0; i < len(arr); i++ {
+				if i == len(arr)-1 {
+					q1 = q1 + "'" + arr[i].Id_Order + "') && status_order = 'Complate' "
+				} else {
+					q1 = q1 + "'" + arr[i].Id_Order + "' , "
+				}
+			}
 
-	defer rows.Close()
+			obj_order_menu_fix.Tanggal_menu = tanggal_menu
 
-	if err != nil {
-		fmt.Println(sqlStatement)
-		return res, err
-	}
+			date, _ := time.Parse("02-01-2006", tanggal_menu)
+			tanggal_menu_sql := date.Format("2006-01-02")
 
-	for rows.Next() {
-		err = rows.Scan(&obj_order_menu_fix.Tanggal_menu)
+			sqlStatement2 := "SELECT detail_order.id_order, id_detail_order, oc.id_catering,c.nama_catering, nama_menu, harga_menu, status_order FROM detail_order JOIN order_catering oc on detail_order.id_order = oc.id_order JOIN catering c on c.id_catering = oc.id_catering"
 
-		if err != nil {
-			return res, err
-		}
+			sqlStatement2 = sqlStatement2 + q1 + q3
 
-		sqlStatement2 := "SELECT detail_order.id_order, id_detail_order, oc.id_catering,c.nama_catering, nama_menu, harga_menu, status_order FROM detail_order JOIN order_catering oc on detail_order.id_order = oc.id_order JOIN catering c on c.id_catering = oc.id_catering"
+			rows2, err := con.Query(sqlStatement2, tanggal_menu_sql)
 
-		sqlStatement2 = sqlStatement2 + q1 + q3
-
-		rows2, err := con.Query(sqlStatement2, obj_order_menu_fix.Tanggal_menu)
-
-		defer rows2.Close()
-
-		if err != nil {
-			return res, err
-		}
-
-		for rows2.Next() {
-			err = rows2.Scan(&obj_order_his.Id_order, &obj_order_his.Id_detail_order, &obj_order_his.Id_catering, &obj_order_his.Nama_catering, &obj_order_his.Nama_menu, &obj_order_his.Harga_menu, &obj_order_his.Status_order)
+			defer rows2.Close()
 
 			if err != nil {
 				return res, err
 			}
 
-			sqlStatement_rating := "SELECT rating FROM rating WHERE id_detail_order=?"
+			for rows2.Next() {
+				err = rows2.Scan(&obj_order_his.Id_order, &obj_order_his.Id_detail_order, &obj_order_his.Id_catering, &obj_order_his.Nama_catering, &obj_order_his.Nama_menu, &obj_order_his.Harga_menu, &obj_order_his.Status_order)
 
-			err := con.QueryRow(sqlStatement_rating, obj_order_his.Id_detail_order).Scan(&obj_order_his.Rating)
+				if err != nil {
+					return res, err
+				}
 
-			if err != nil {
-				fmt.Println(err)
-				obj_order_his.Rating = 0
+				sqlStatement_rating := "SELECT rating FROM rating WHERE id_detail_order=?"
+
+				err := con.QueryRow(sqlStatement_rating, obj_order_his.Id_detail_order).Scan(&obj_order_his.Rating)
+
+				if err != nil {
+					fmt.Println(err)
+					obj_order_his.Rating = 0
+				}
+
+				arr_order_his = append(arr_order_his, obj_order_his)
+			}
+			obj_order_menu_fix.History_Order = arr_order_his
+
+			arr_order_menu_fix = append(arr_order_menu_fix, obj_order_menu_fix)
+
+			if arr_order_menu_fix == nil {
+				res.Status = http.StatusNotFound
+				res.Message = "Not Found"
+				res.Data = arr_order_menu_fix
+			} else {
+				res.Status = http.StatusOK
+				res.Message = "Sukses"
+				res.Data = arr_order_menu_fix
 			}
 
-			arr_order_his = append(arr_order_his, obj_order_his)
 		}
-		obj_order_menu_fix.History_Order = arr_order_his
-
-		arr_order_menu_fix = append(arr_order_menu_fix, obj_order_menu_fix)
-	}
-
-	if arr_order_menu_fix == nil {
+	} else {
 		res.Status = http.StatusNotFound
 		res.Message = "Not Found"
-		res.Data = arr_order_menu_fix
-	} else {
-		res.Status = http.StatusOK
-		res.Message = "Sukses"
-		res.Data = arr_order_menu_fix
+		res.Data = arr
 	}
 
 	return res, nil
@@ -646,6 +769,212 @@ func Read_Location_User(id_detail_order string) (tools.Response, error) {
 	} else {
 		res.Status = http.StatusOK
 		res.Message = "Sukses"
+		res.Data = arr
+	}
+
+	return res, nil
+}
+
+//Filter Order Menu
+func Filter_Order_Menu(id string, tanggal_menu string) (tools.Response, error) {
+	var res tools.Response
+	var arr []Order.Read_Id_Order
+	var obj Order.Read_Id_Order
+
+	var arr_order_menu_fix []Order.Read_Menu_Order
+	var obj_order_menu_fix Order.Read_Menu_Order
+
+	var arr_order_menu []Order.Menu_Order_Dipesan
+	var obj_order_menu Order.Menu_Order_Dipesan
+
+	con := db.CreateCon()
+
+	sqlStatement := ""
+	if strings.HasPrefix(id, "US") {
+		sqlStatement = "SELECT id_order FROM order_catering WHERE order_catering.id_user=?"
+	} else if strings.HasPrefix(id, "CT") {
+		sqlStatement = "SELECT id_order FROM order_catering WHERE order_catering.id_catering=?"
+	} else {
+		res.Status = http.StatusNotFound
+		res.Message = "Not Found"
+		res.Data = arr
+	}
+
+	rows, err := con.Query(sqlStatement, id)
+
+	defer rows.Close()
+
+	if err != nil {
+		return res, err
+	}
+
+	for rows.Next() {
+		err = rows.Scan(&obj.Id_Order)
+		if err != nil {
+			return res, err
+		}
+		arr = append(arr, obj)
+	}
+
+	if arr != nil {
+
+		q1 := " WHERE detail_order.id_order IN ("
+		q3 := " && tanggal_menu=?"
+		sqlStatement = "SELECT DISTINCT(detail_order.tanggal_menu) FROM detail_order"
+
+		for i := 0; i < len(arr); i++ {
+			if i == len(arr)-1 {
+				q1 = q1 + "'" + arr[i].Id_Order + "') && status_order != 'Complate' "
+			} else {
+				q1 = q1 + "'" + arr[i].Id_Order + "' , "
+			}
+		}
+
+		obj_order_menu_fix.Tanggal_menu = tanggal_menu
+
+		date, _ := time.Parse("02-01-2006", tanggal_menu)
+		tanggal_menu_sql := date.Format("2006-01-02")
+
+		sqlStatement2 := "SELECT detail_order.id_order, id_detail_order, oc.id_catering,c.nama_catering,id_pengantar, nama_menu, harga_menu, status_order, radius, m.longtitude, m.langtitude  FROM detail_order JOIN order_catering oc on detail_order.id_order = oc.id_order JOIN catering c on c.id_catering = oc.id_catering JOIN maps m on c.id_catering = m.id_catering"
+
+		sqlStatement2 = sqlStatement2 + q1 + q3
+
+		rows2, err := con.Query(sqlStatement2, tanggal_menu_sql)
+
+		defer rows2.Close()
+
+		if err != nil {
+			return res, err
+		}
+
+		for rows2.Next() {
+			err = rows2.Scan(&obj_order_menu.Id_order, &obj_order_menu.Id_detail_order, &obj_order_menu.Id_catering, &obj_order_menu.Nama_catering, &obj_order_menu.Id_pengantar, &obj_order_menu.Nama_menu, &obj_order_menu.Harga_menu, &obj_order_menu.Status_order, &obj_order_menu.Radius, &obj_order_menu.Longtitude, &obj_order_menu.Langtitude)
+
+			if err != nil {
+				return res, err
+			}
+
+			arr_order_menu = append(arr_order_menu, obj_order_menu)
+		}
+		obj_order_menu_fix.Menu_Order_Dipesan = arr_order_menu
+
+		arr_order_menu_fix = append(arr_order_menu_fix, obj_order_menu_fix)
+
+		if arr_order_menu_fix == nil {
+			res.Status = http.StatusNotFound
+			res.Message = "Not Found"
+			res.Data = arr_order_menu_fix
+		} else {
+			res.Status = http.StatusOK
+			res.Message = "Sukses"
+			res.Data = arr_order_menu_fix
+		}
+	} else {
+		res.Status = http.StatusNotFound
+		res.Message = "Not Found"
+		res.Data = arr
+	}
+
+	return res, nil
+}
+
+//Filter History Order
+func Filter_History_Order(id_user string, tanggal_menu string) (tools.Response, error) {
+	var res tools.Response
+	var arr []Order.Read_Id_Order
+	var obj Order.Read_Id_Order
+
+	var arr_order_menu_fix []Order.Read_Menu_Order_His
+	var obj_order_menu_fix Order.Read_Menu_Order_His
+
+	var arr_order_his []Order.History_Order
+	var obj_order_his Order.History_Order
+
+	con := db.CreateCon()
+
+	sqlStatement := "SELECT id_order FROM order_catering WHERE order_catering.id_user=?"
+
+	rows, err := con.Query(sqlStatement, id_user)
+
+	defer rows.Close()
+
+	if err != nil {
+		return res, err
+	}
+
+	for rows.Next() {
+		err = rows.Scan(&obj.Id_Order)
+		if err != nil {
+			return res, err
+		}
+		arr = append(arr, obj)
+	}
+
+	if arr != nil {
+
+		q1 := " WHERE detail_order.id_order IN ("
+		q3 := " && tanggal_menu=?"
+
+		for i := 0; i < len(arr); i++ {
+			if i == len(arr)-1 {
+				q1 = q1 + "'" + arr[i].Id_Order + "') && status_order = 'Complate' "
+			} else {
+				q1 = q1 + "'" + arr[i].Id_Order + "' , "
+			}
+		}
+
+		obj_order_menu_fix.Tanggal_menu = tanggal_menu
+
+		date, _ := time.Parse("02-01-2006", tanggal_menu)
+		tanggal_menu_sql := date.Format("2006-01-02")
+
+		sqlStatement2 := "SELECT detail_order.id_order, id_detail_order, oc.id_catering,c.nama_catering, nama_menu, harga_menu, status_order FROM detail_order JOIN order_catering oc on detail_order.id_order = oc.id_order JOIN catering c on c.id_catering = oc.id_catering"
+
+		sqlStatement2 = sqlStatement2 + q1 + q3
+
+		rows2, err := con.Query(sqlStatement2, tanggal_menu_sql)
+
+		defer rows2.Close()
+
+		if err != nil {
+			return res, err
+		}
+
+		for rows2.Next() {
+			err = rows2.Scan(&obj_order_his.Id_order, &obj_order_his.Id_detail_order, &obj_order_his.Id_catering, &obj_order_his.Nama_catering, &obj_order_his.Nama_menu, &obj_order_his.Harga_menu, &obj_order_his.Status_order)
+
+			if err != nil {
+				return res, err
+			}
+
+			sqlStatement_rating := "SELECT rating FROM rating WHERE id_detail_order=?"
+
+			err := con.QueryRow(sqlStatement_rating, obj_order_his.Id_detail_order).Scan(&obj_order_his.Rating)
+
+			if err != nil {
+				fmt.Println(err)
+				obj_order_his.Rating = 0
+			}
+
+			arr_order_his = append(arr_order_his, obj_order_his)
+		}
+		obj_order_menu_fix.History_Order = arr_order_his
+
+		arr_order_menu_fix = append(arr_order_menu_fix, obj_order_menu_fix)
+
+		if arr_order_menu_fix == nil {
+			res.Status = http.StatusNotFound
+			res.Message = "Not Found"
+			res.Data = arr_order_menu_fix
+		} else {
+			res.Status = http.StatusOK
+			res.Message = "Sukses"
+			res.Data = arr_order_menu_fix
+		}
+
+	} else {
+		res.Status = http.StatusNotFound
+		res.Message = "Not Found"
 		res.Data = arr
 	}
 

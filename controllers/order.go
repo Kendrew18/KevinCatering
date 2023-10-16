@@ -35,8 +35,9 @@ func InputOrder(c echo.Context) error {
 //Show_Order_Menu
 func ShowOrderMenu(c echo.Context) error {
 	id := c.FormValue("id")
+	tanggal_menu := c.FormValue("tanggal_menu")
 
-	result, err := models.Show_Order_Menu(id)
+	result, err := models.Show_Order_Menu(id, tanggal_menu)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
@@ -89,8 +90,9 @@ func OrderDetailUser(c echo.Context) error {
 //History Order
 func HistoryOrder(c echo.Context) error {
 	id_user := c.FormValue("id_user")
+	tanggal_menu := c.FormValue("tanggal_menu")
 
-	result, err := models.History_Order(id_user)
+	result, err := models.History_Order(id_user, tanggal_menu)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
@@ -123,4 +125,32 @@ func ReadLocationUser(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, result)
+}
+
+//Filter Order Menu
+func FilterOrderMenu(c echo.Context) error {
+	id := c.FormValue("id")
+	tanggal_menu := c.FormValue("tanggal_menu")
+
+	result, err := models.Filter_Order_Menu(id, tanggal_menu)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(result.Status, result)
+}
+
+//Filter History Order
+func FilterHistoryOrder(c echo.Context) error {
+	id_user := c.FormValue("id_user")
+	tanggal_menu := c.FormValue("tanggal_menu")
+
+	result, err := models.Filter_History_Order(id_user, tanggal_menu)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(result.Status, result)
 }

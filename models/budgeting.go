@@ -10,7 +10,7 @@ import (
 )
 
 //Input_Budgeting
-func Input_Budgeting(id_catering string, nama_menu string, total_porsi int, tanggal_budgeting string, nama_bahan string, jumlah_bahan string, satuan_bahan string, harga_bahan string) (tools.Response, error) {
+func Input_Budgeting(id_catering string, total_porsi int, tanggal_budgeting string, id_master_menu string) (tools.Response, error) {
 	var res tools.Response
 	con := db.CreateCon()
 
@@ -27,7 +27,7 @@ func Input_Budgeting(id_catering string, nama_menu string, total_porsi int, tang
 	date, _ := time.Parse("02-01-2006", tanggal_budgeting)
 	date_sql := date.Format("2006-01-02")
 
-	sqlStatement := "INSERT INTO budgeting (co, id_budgeting, id_catering, nama_menu, total_porsi, tanggal_budgeting) values(?,?,?,?,?,?)"
+	sqlStatement := "INSERT INTO budgeting (co, id_budgeting, id_master_menu, id_catering, total_porsi, tanggal_budgeting) values(?,?,?,?,?,?)"
 
 	stmt, err := con.Prepare(sqlStatement)
 
@@ -35,38 +35,7 @@ func Input_Budgeting(id_catering string, nama_menu string, total_porsi int, tang
 		return res, err
 	}
 
-	_, err = stmt.Exec(nm_str, id_BD, id_catering, nama_menu, total_porsi, date_sql)
-
-	nama_bahan_SS := tools.String_Separator_To_String(nama_bahan)
-	jumlah_bahan_SS := tools.String_Separator_To_float64(jumlah_bahan)
-	satuan_bahan_SS := tools.String_Separator_To_String(satuan_bahan)
-	harga_bahan_SS := tools.String_Separator_To_Int64(harga_bahan)
-
-	for i := 0; i < len(nama_bahan_SS); i++ {
-		nm_str_BHN := 0
-
-		Sqlstatement_BHN := "SELECT co FROM bahan_menu ORDER BY co DESC Limit 1"
-
-		_ = con.QueryRow(Sqlstatement_BHN).Scan(&nm_str_BHN)
-
-		nm_str_BHN = nm_str_BHN + 1
-
-		id_BHN := "BHN-" + strconv.Itoa(nm_str_BHN)
-
-		Sqlstatement_BHN = "INSERT INTO bahan_menu (co, id_bahan_menu, id_budgeting, nama_bahan, jumlah_bahan, satuan_bahan, harga_bahan) values(?,?,?,?,?,?,?)"
-
-		stmt_BHN, err := con.Prepare(Sqlstatement_BHN)
-
-		if err != nil {
-			return res, err
-		}
-
-		_, err = stmt_BHN.Exec(nm_str_BHN, id_BHN, id_BD, nama_bahan_SS[i], jumlah_bahan_SS[i], satuan_bahan_SS[i], harga_bahan_SS[i])
-
-		if err != nil {
-			return res, err
-		}
-	}
+	_, err = stmt.Exec(nm_str, id_BD, id_master_menu, id_catering, total_porsi, date_sql)
 
 	stmt.Close()
 
@@ -77,14 +46,14 @@ func Input_Budgeting(id_catering string, nama_menu string, total_porsi int, tang
 }
 
 //Read_Budgeting
-func Read_Budgeting_Awal(id_catering string) (tools.Response, error) {
+func Read_List_Budgeting(id_catering string) (tools.Response, error) {
 	var res tools.Response
 	var arr []Budgeting.Read_Budgeting_Awal
 	var obj Budgeting.Read_Budgeting_Awal
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_budgeting,nama_menu FROM budgeting WHERE id_catering=?"
+	sqlStatement := "SELECT id_budgeting, mm.nama_menu FROM budgeting join master_menu mm on mm.id_master_menu = budgeting.id_master_menu WHERE budgeting.id_catering=? && budgeting.status = 0"
 
 	rows, err := con.Query(sqlStatement, id_catering)
 
@@ -126,17 +95,17 @@ func Read_Budgeting(id_budgeting string) (tools.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_budgeting, nama_menu, total_porsi, tanggal_budgeting FROM budgeting WHERE id_budgeting=? "
+	sqlStatement := "SELECT id_budgeting,mm.id_master_menu, nama_menu, total_porsi, tanggal_budgeting FROM budgeting JOIN master_menu mm on mm.id_master_menu = budgeting.id_master_menu WHERE id_budgeting=? "
 
-	err := con.QueryRow(sqlStatement, id_budgeting).Scan(&obj.Id_budgeting, &obj.Nama_menu, &obj.Total_porsi, &obj.Tanggal_budgeting)
+	err := con.QueryRow(sqlStatement, id_budgeting).Scan(&obj.Id_budgeting, &obj.Id_Master_Menu, &obj.Nama_menu, &obj.Total_porsi, &obj.Tanggal_budgeting)
 
 	if err != nil {
 		return res, err
 	}
 
-	sqlStatement = "SELECT id_bahan_menu, nama_bahan, jumlah_bahan, satuan_bahan, harga_bahan FROM bahan_menu WHERE id_budgeting=?"
+	sqlStatement = "SELECT id_bahan_menu, nama_bahan, jumlah_bahan, satuan_bahan, harga_bahan FROM bahan_menu WHERE id_master_menu=?"
 
-	rows, err := con.Query(sqlStatement, id_budgeting)
+	rows, err := con.Query(sqlStatement, obj.Id_Master_Menu)
 
 	defer rows.Close()
 
@@ -146,6 +115,11 @@ func Read_Budgeting(id_budgeting string) (tools.Response, error) {
 
 	for rows.Next() {
 		err = rows.Scan(&bahan.Id_bahan, &bahan.Nama_bahan, &bahan.Jumlah_bahan, &bahan.Satuan_bahan, &bahan.Harga_bahan)
+
+		bahan.Jumlah_bahan = bahan.Jumlah_bahan * float64(obj.Total_porsi)
+
+		bahan.Harga_bahan = bahan.Harga_bahan * obj.Total_porsi
+
 		if err != nil {
 			return res, err
 		}
@@ -164,6 +138,41 @@ func Read_Budgeting(id_budgeting string) (tools.Response, error) {
 		res.Status = http.StatusOK
 		res.Message = "Sukses"
 		res.Data = arr
+	}
+
+	return res, nil
+}
+
+//Update_Status
+func Update_Status_Budgeting(id_budgeting string) (tools.Response, error) {
+	var res tools.Response
+
+	con := db.CreateCon()
+
+	sqlstatement := "UPDATE budgeting SET status=? WHERE id_budgeting=?"
+
+	stmt, err := con.Prepare(sqlstatement)
+
+	if err != nil {
+		return res, err
+	}
+
+	result, err := stmt.Exec(1, id_budgeting)
+
+	if err != nil {
+		return res, err
+	}
+
+	rowschanged, err := result.RowsAffected()
+
+	if err != nil {
+		return res, err
+	}
+
+	res.Status = http.StatusOK
+	res.Message = "Suksess"
+	res.Data = map[string]int64{
+		"rows": rowschanged,
 	}
 
 	return res, nil

@@ -15,7 +15,7 @@ import (
 )
 
 //input menu
-func Input_Menu(id_catering string, nama_menu string, harga_menu int64, tanggal_menu string, jam_pengiriman_awal string, jam_pengiriman_akhir string, status int, writer http.ResponseWriter, request *http.Request) (tools.Response, error) {
+func Input_Menu(id_catering string, id_master_menu string, harga_menu int64, tanggal_menu string, jam_pengiriman_awal string, jam_pengiriman_akhir string, status int, writer http.ResponseWriter, request *http.Request) (tools.Response, error) {
 	var res tools.Response
 	var id Menu.Read_Id_Menu
 
@@ -93,7 +93,7 @@ func Input_Menu(id_catering string, nama_menu string, harga_menu int64, tanggal_
 	date, _ := time.Parse("02-01-2006", tanggal_menu)
 	date_sql := date.Format("2006-01-02")
 
-	sqlStatement := "INSERT INTO menu (co, id_catering, id_menu, nama_menu, harga_menu, tanggal_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu,foto_menu) values(?,?,?,?,?,?,?,?,?,?)"
+	sqlStatement := "INSERT INTO menu (co, id_menu, id_catering, id_master_menu, harga_menu, tanggal_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu, foto_menu) values(?,?,?,?,?,?,?,?,?,?)"
 
 	stmt, err := con.Prepare(sqlStatement)
 
@@ -101,7 +101,7 @@ func Input_Menu(id_catering string, nama_menu string, harga_menu int64, tanggal_
 		return res, err
 	}
 
-	_, err = stmt.Exec(nm_str, id_catering, id_MN, nama_menu, harga_menu, date_sql, jam_pengiriman_awal, jam_pengiriman_akhir, status, path)
+	_, err = stmt.Exec(nm_str, id_catering, id_MN, id_master_menu, harga_menu, date_sql, jam_pengiriman_awal, jam_pengiriman_akhir, status, path)
 
 	stmt.Close()
 
@@ -129,7 +129,7 @@ func Read_Menu(id_catering string, tanggal_menu string, tanggal_menu2 string) (t
 		date, _ := time.Parse("02-01-2006", tanggal_menu)
 		date_sql := date.Format("2006-01-02")
 
-		sqlStatement := "SELECT id_menu, nama_menu, harga_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu, foto_menu FROM menu WHERE tanggal_menu=? && id_catering=? "
+		sqlStatement := "SELECT id_menu, nama_menu, harga_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu, foto_menu FROM menu join master_menu mm on mm.id_master_menu = menu.id_master_menu WHERE tanggal_menu=? && menu.id_catering=? "
 
 		rows, err := con.Query(sqlStatement, date_sql, id_catering)
 
@@ -186,7 +186,7 @@ func Read_Menu(id_catering string, tanggal_menu string, tanggal_menu2 string) (t
 			var obj Menu.Read_Menu_fix
 			var arr2 []Menu.Read_Menu_fix
 
-			sqlStatement := "SELECT id_menu, nama_menu, harga_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu, foto_menu FROM menu WHERE tanggal_menu=? && id_catering=? "
+			sqlStatement := "SELECT id_menu, nama_menu, harga_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu, foto_menu FROM menu join master_menu mm on mm.id_master_menu = menu.id_master_menu WHERE tanggal_menu=? && menu.id_catering=?"
 
 			rows, err := con.Query(sqlStatement, arr_tgl[i].Tanggal, id_catering)
 
@@ -233,7 +233,7 @@ func Read_Menu(id_catering string, tanggal_menu string, tanggal_menu2 string) (t
 }
 
 //edit menu
-func Edit_Menu(id_catering string, id_menu string, nama_menu string, harga_menu int64, jam_pengiriman_awal string, jam_pengiriman_akhir string) (tools.Response, error) {
+func Edit_Menu(id_catering string, id_menu string, harga_menu int64, jam_pengiriman_awal string, jam_pengiriman_akhir string) (tools.Response, error) {
 	var res tools.Response
 
 	con := db.CreateCon()
@@ -246,7 +246,7 @@ func Edit_Menu(id_catering string, id_menu string, nama_menu string, harga_menu 
 
 	if condition == "" {
 
-		sqlstatement := "UPDATE menu SET nama_menu=?,harga_menu=?,jam_pengiriman_awal=?,jam_pengiriman_akhir=? WHERE id_catering=? && id_menu=?"
+		sqlstatement := "UPDATE menu SET harga_menu=?,jam_pengiriman_awal=?,jam_pengiriman_akhir=? WHERE id_catering=? && id_menu=?"
 
 		stmt, err := con.Prepare(sqlstatement)
 
@@ -254,7 +254,7 @@ func Edit_Menu(id_catering string, id_menu string, nama_menu string, harga_menu 
 			return res, err
 		}
 
-		result, err := stmt.Exec(nama_menu, harga_menu, jam_pengiriman_awal, jam_pengiriman_akhir, id_catering, id_menu)
+		result, err := stmt.Exec(harga_menu, jam_pengiriman_awal, jam_pengiriman_akhir, id_catering, id_menu)
 
 		if err != nil {
 			return res, err

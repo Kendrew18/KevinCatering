@@ -3,6 +3,7 @@ package routes
 import (
 	"KevinCatering/controllers"
 	"KevinCatering/controllers/Favorite_Catering"
+	"KevinCatering/controllers/Master_Menu"
 	"KevinCatering/controllers/Notif"
 	"KevinCatering/controllers/Rating"
 	"github.com/labstack/echo/v4"
@@ -26,8 +27,6 @@ func Init() *echo.Echo {
 	ORD := e.Group("/ORD")
 	PBR := e.Group("/PBR")
 	MP := e.Group("/MP")
-	BD := e.Group("/BD")
-	RL := e.Group("/RL")
 	RT := e.Group("/RT")
 	NTF := e.Group("/NTF")
 
@@ -126,21 +125,33 @@ func Init() *echo.Echo {
 	MP.GET("/read-Maps", controllers.ReadMaps)
 
 	//Budgeting
+	BD := e.Group("/BD")
 	//Input_Budgeting
 	BD.POST("/input-budgeting", controllers.InputBudgeting)
 	//Read_Awal_Budgeting
 	BD.GET("/read-awal-budgeting", controllers.ReadAwalBudgeting)
 	//Read_Budgeting
 	BD.GET("/read-budgeting", controllers.ReadBudgeting)
+	//Update_Status
+	BD.PUT("/update-status", controllers.UpdateStatusBudgeting)
 
 	//Realisasi
+	RL := e.Group("/RL")
 	//Input_Realisai
 	RL.POST("/input-realisasi", controllers.InputRealisasi)
 	//Read_Realisasi
 	RL.GET("/read-realisasi", controllers.ReadRealisasi)
+	//Read_Tabel_Realisasi
+	RL.GET("/read-tabel-realisasi", controllers.ReadTabelRealisasi)
 
 	//Rating
 	RT.POST("/input-rating", Rating.InputRating)
+
+	//Master_Menu
+	MM := e.Group("/MM")
+	MM.POST("/master-menu", Master_Menu.InputMasterMenu)
+	MM.GET("/master-menu", Master_Menu.ReadMasterMenu)
+	MM.GET("/dropdown", Master_Menu.DropDownMasterMenu)
 
 	return e
 }

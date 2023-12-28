@@ -7,6 +7,7 @@ type Read_Budgeting_Awal struct {
 
 type Read_Budgeting struct {
 	Id_budgeting      string       `json:"id_budgeting"`
+	Id_Master_Menu    string       `json:"id_master_menu"`
 	Nama_menu         string       `json:"nama_menu"`
 	Total_porsi       int          `json:"total_porsi"`
 	Tanggal_budgeting string       `json:"tanggal_budgeting"`

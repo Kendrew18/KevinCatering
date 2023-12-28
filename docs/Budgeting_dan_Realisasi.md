@@ -9,13 +9,9 @@ Method: POST
 Controllers:
 
     id_catering := c.FormValue("id_catering")
-	nama_menu := c.FormValue("nama_menu")
+	id_master_menu := c.FormValue("id_master_menu")
 	total_porsi := c.FormValue("total_porsi")
 	tanggal_budgeting := c.FormValue("tanggal_budgeting")
-	nama_bahan := c.FormValue("nama_bahan")
-	jumlah_bahan := c.FormValue("jumlah_bahan")
-	satuan_bahan := c.FormValue("satuan_bahan")
-	harga_bahan := c.FormValue("harga_bahan")
 
 ##  Read Awal Budgeting (APK catering)
 
@@ -37,7 +33,28 @@ Controllers:
 
     id_budgeting := c.FormValue("id_budgeting")
 
-##  Input Budgeting (APK catering)
+##  Update Status (APK catering)
+
+Link: kostsoda.onthewifi.com:3333/BD/update-status
+
+Method: PUT
+
+Controllers:
+
+    id_budgeting := c.FormValue("id_budgeting")
+
+##  Read Tabel Realisasi (APK catering)
+
+Link: kostsoda.onthewifi.com:3333/RL/read-tabel-realisasi
+
+Method: GET
+
+Controllers:
+
+    id_budgeting := c.FormValue("id_budgeting")
+    id_master_menu := c.FormValue("id_master_menu")
+
+##  Input Realisasi (APK catering)
 
 Link: kostsoda.onthewifi.com:3333/RL/input-realisasi
 
@@ -45,12 +62,13 @@ Method: POST
 
 Controllers:
 
-    id_bahan_menu := c.FormValue("id_bahan_menu")
+    id_budgeting := c.FormValue("id_budgeting")
+	id_bahan_menu := c.FormValue("id_bahan_menu")
 	keterangan := c.FormValue("keterangan")
 	jumlah := c.FormValue("jumlah")
 	harga := c.FormValue("harga")
 
-##  Read Awal Budgeting (APK catering)
+##  Read Realisasi (APK catering)
 
 Link: kostsoda.onthewifi.com:3333/RL/read-realisasi
 
@@ -58,4 +76,5 @@ Method: GET
 
 Controllers:
 
-    id_bahan_menu := c.FormValue("id_bahan_menu")
+    id_budgeting := c.FormValue("id_budgeting")
+	id_bahan_menu := c.FormValue("id_bahan_menu")

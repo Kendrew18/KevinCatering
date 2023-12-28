@@ -43,9 +43,10 @@ func InputRealisasi(c echo.Context) error {
 
 //Read Realisasi
 func ReadRealisasi(c echo.Context) error {
+	id_budgeting := c.FormValue("id_budgeting")
 	id_bahan_menu := c.FormValue("id_bahan_menu")
 
-	result, err := models.Read_Realisasi(id_bahan_menu)
+	result, err := models.Read_Realisasi(id_bahan_menu, id_budgeting)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

@@ -95,16 +95,16 @@ func Input_Realisasi(id_budgeting string, id_bahan_menu string, keterangan strin
 }
 
 //Read_Realisasi
-func Read_Realisasi(id_bahan_menu string) (tools.Response, error) {
+func Read_Realisasi(id_bahan_menu string, id_budgeting string) (tools.Response, error) {
 	var res tools.Response
 	var arr []Realisasi.Read_Realisasi
 	var obj Realisasi.Read_Realisasi
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_realisasi, keterangan, harga_bahan, jumlah_bahan FROM realisasi WHERE id_bahan_menu=?"
+	sqlStatement := "SELECT id_realisasi, keterangan, harga_bahan, jumlah_bahan FROM realisasi WHERE id_bahan_menu=? && id_budgeting=?"
 
-	rows, err := con.Query(sqlStatement, id_bahan_menu)
+	rows, err := con.Query(sqlStatement, id_bahan_menu, id_budgeting)
 
 	defer rows.Close()
 

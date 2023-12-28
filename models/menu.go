@@ -101,7 +101,11 @@ func Input_Menu(id_catering string, id_master_menu string, harga_menu int64, tan
 		return res, err
 	}
 
-	_, err = stmt.Exec(nm_str, id_catering, id_MN, id_master_menu, harga_menu, date_sql, jam_pengiriman_awal, jam_pengiriman_akhir, status, path)
+	_, err = stmt.Exec(nm_str, id_MN, id_catering, id_master_menu, harga_menu, date_sql, jam_pengiriman_awal, jam_pengiriman_akhir, status, path)
+
+	if err != nil {
+		return res, err
+	}
 
 	stmt.Close()
 

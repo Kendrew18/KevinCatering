@@ -114,7 +114,7 @@ func Input_Order(id_catering string, id_user string, id_menu string, nama_menu s
 		return res, err
 	}
 
-	_, err = stmt.Exec(nm_str, id_OD, id_catering, id_user, alamat, total, date_sql2, longtitude, langtitude)
+	_, err = stmt.Exec(nm_str, id_OD, id_user, id_catering, alamat, total, date_sql2, longtitude, langtitude)
 
 	fmt.Println(id_M)
 

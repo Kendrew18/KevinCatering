@@ -133,7 +133,7 @@ func Read_Menu(id_catering string, tanggal_menu string, tanggal_menu2 string) (t
 		date, _ := time.Parse("02-01-2006", tanggal_menu)
 		date_sql := date.Format("2006-01-02")
 
-		sqlStatement := "SELECT id_menu, nama_menu, harga_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu, foto_menu FROM menu join master_menu mm on mm.id_master_menu = menu.id_master_menu WHERE tanggal_menu=? && menu.id_catering=? "
+		sqlStatement := "SELECT id_menu,mm.id_master_menu, nama_menu, harga_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu, foto_menu, deskripsi_menu FROM menu join master_menu mm on mm.id_master_menu = menu.id_master_menu WHERE tanggal_menu=? && menu.id_catering=? "
 
 		rows, err := con.Query(sqlStatement, date_sql, id_catering)
 
@@ -144,10 +144,37 @@ func Read_Menu(id_catering string, tanggal_menu string, tanggal_menu2 string) (t
 		}
 
 		for rows.Next() {
-			err = rows.Scan(&obj.Id_menu, &obj.Nama_menu, &obj.Harga_menu, &obj.Jam_pengiriman_awal, &obj.Jam_pengiriman_akhir, &obj.Status_menu, &obj.Foto_menu)
+			err = rows.Scan(&obj.Id_menu, &obj.Id_master_menu, &obj.Nama_menu, &obj.Harga_menu, &obj.Jam_pengiriman_awal, &obj.Jam_pengiriman_akhir, &obj.Status_menu, &obj.Foto_menu, &obj.Deskripsi_menu)
+
 			if err != nil {
 				return res, err
 			}
+
+			var obj_bahan Menu.Bahan_Menu
+			var arr_bahan []Menu.Bahan_Menu
+
+			sqlStatement = "SELECT id_bahan_menu,nama_bahan FROM bahan_menu WHERE id_master_menu = ? ORDER BY co ASC "
+
+			rows_bahan, err := con.Query(sqlStatement, obj.Id_master_menu)
+
+			defer rows_bahan.Close()
+
+			if err != nil {
+				return res, err
+			}
+
+			for rows_bahan.Next() {
+				err = rows_bahan.Scan(&obj_bahan.Id_bahan_menu, &obj_bahan.Nama_bahan_menu)
+
+				if err != nil {
+					return res, err
+				}
+
+				arr_bahan = append(arr_bahan, obj_bahan)
+			}
+
+			obj.Bahan_menu = arr_bahan
+
 			arr = append(arr, obj)
 		}
 
@@ -190,7 +217,7 @@ func Read_Menu(id_catering string, tanggal_menu string, tanggal_menu2 string) (t
 			var obj Menu.Read_Menu_fix
 			var arr2 []Menu.Read_Menu_fix
 
-			sqlStatement := "SELECT id_menu, nama_menu, harga_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu, foto_menu FROM menu join master_menu mm on mm.id_master_menu = menu.id_master_menu WHERE tanggal_menu=? && menu.id_catering=?"
+			sqlStatement := "SELECT id_menu,menu.id_master_menu, nama_menu, harga_menu, jam_pengiriman_awal, jam_pengiriman_akhir, status_menu, foto_menu, deskripsi_menu FROM menu join master_menu mm on mm.id_master_menu = menu.id_master_menu WHERE tanggal_menu=? && menu.id_catering=?"
 
 			rows, err := con.Query(sqlStatement, arr_tgl[i].Tanggal, id_catering)
 
@@ -201,11 +228,36 @@ func Read_Menu(id_catering string, tanggal_menu string, tanggal_menu2 string) (t
 			}
 
 			for rows.Next() {
-				err = rows.Scan(&obj.Id_menu, &obj.Nama_menu, &obj.Harga_menu,
-					&obj.Jam_pengiriman_awal, &obj.Jam_pengiriman_akhir, &obj.Status_menu, &obj.Foto_menu)
+				err = rows.Scan(&obj.Id_menu, &obj.Id_master_menu, &obj.Nama_menu, &obj.Harga_menu, &obj.Jam_pengiriman_awal, &obj.Jam_pengiriman_akhir, &obj.Status_menu, &obj.Foto_menu, &obj.Deskripsi_menu)
 				if err != nil {
 					return res, err
 				}
+
+				var obj_bahan Menu.Bahan_Menu
+				var arr_bahan []Menu.Bahan_Menu
+
+				sqlStatement = "SELECT id_bahan_menu,nama_bahan FROM bahan_menu WHERE id_master_menu = ? ORDER BY co ASC "
+
+				rows_bahan, err := con.Query(sqlStatement, obj.Id_master_menu)
+
+				defer rows_bahan.Close()
+
+				if err != nil {
+					return res, err
+				}
+
+				for rows_bahan.Next() {
+					err = rows_bahan.Scan(&obj_bahan.Id_bahan_menu, &obj_bahan.Nama_bahan_menu)
+
+					if err != nil {
+						return res, err
+					}
+
+					arr_bahan = append(arr_bahan, obj_bahan)
+				}
+
+				obj.Bahan_menu = arr_bahan
+
 				arr2 = append(arr2, obj)
 			}
 
@@ -310,7 +362,7 @@ func Delete_Menu(id_catering string, id_menu string) (tools.Response, error) {
 			return res, err
 		}
 
-		_, err = result.RowsAffected()
+		rowaff, err := result.RowsAffected()
 
 		if err != nil {
 			return res, err
@@ -320,6 +372,7 @@ func Delete_Menu(id_catering string, id_menu string) (tools.Response, error) {
 
 		res.Status = http.StatusOK
 		res.Message = "Suksess"
+		res.Data = "data affacted: " + strconv.FormatInt(rowaff, 10)
 
 	} else {
 		res.Status = http.StatusNotFound

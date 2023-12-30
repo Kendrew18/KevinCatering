@@ -15,7 +15,7 @@ import (
 )
 
 //Input_Order
-func Input_Order(id_catering string, id_user string, id_menu string, nama_menu string, jumlah string, harga_menu string, tanggal_menu string, tanggal_order string, langtitude float64, longtitude float64, writer http.ResponseWriter, request *http.Request) (tools.Response, error) {
+func Input_Order(id_catering string, id_user string, id_menu string, nama_menu string, jumlah string, harga_menu string, tanggal_menu string, tanggal_order string, alamat string, langtitude float64, longtitude float64, writer http.ResponseWriter, request *http.Request) (tools.Response, error) {
 	var res tools.Response
 
 	con := db.CreateCon()
@@ -106,7 +106,7 @@ func Input_Order(id_catering string, id_user string, id_menu string, nama_menu s
 		total = total + (jmlh_mn[i] * harga_mn[i])
 	}
 
-	sqlStatement := "INSERT INTO order_catering (co, id_order,id_catering,id_user,total,tanggal_order,longtitude,langtitude) values(?,?,?,?,?,?,?,?)"
+	sqlStatement := "INSERT INTO order_catering (co, id_order, id_user, id_catering, alamat, total, tanggal_order, longtitude, langtitude) values(?,?,?,?,?,?,?,?,?)"
 
 	stmt, err := con.Prepare(sqlStatement)
 
@@ -114,7 +114,7 @@ func Input_Order(id_catering string, id_user string, id_menu string, nama_menu s
 		return res, err
 	}
 
-	_, err = stmt.Exec(nm_str, id_OD, id_catering, id_user, total, date_sql2, longtitude, langtitude)
+	_, err = stmt.Exec(nm_str, id_OD, id_catering, id_user, alamat, total, date_sql2, longtitude, langtitude)
 
 	fmt.Println(id_M)
 
@@ -699,7 +699,7 @@ func Read_Order_Pengantar(id_pengantar string) (tools.Response, error) {
 			return res, err
 		}
 
-		sqlStatement2 := "SELECT detail_order.id_order, id_detail_order, oc.id_catering,c.nama_catering,id_pengantar, nama_menu, harga_menu, status_order, radius, m.longtitude, m.langtitude  FROM detail_order JOIN order_catering oc on detail_order.id_order = oc.id_order JOIN catering c on c.id_catering = oc.id_catering JOIN maps m on c.id_catering = m.id_catering WHERE detail_order.id_pengantar=? && tanggal_menu=? && status_order=?"
+		sqlStatement2 := "SELECT detail_order.id_order, id_detail_order, oc.id_catering,c.nama_catering,id_pengantar, nama_menu, harga_menu, status_order, radius, m.longtitude, m.langtitude,oc.alamat  FROM detail_order JOIN order_catering oc on detail_order.id_order = oc.id_order JOIN catering c on c.id_catering = oc.id_catering JOIN maps m on c.id_catering = m.id_catering WHERE detail_order.id_pengantar=? && tanggal_menu=? && status_order=?"
 
 		rows2, err := con.Query(sqlStatement2, id_pengantar, obj_order_menu_fix.Tanggal_menu, "On Delivery")
 

@@ -17,13 +17,14 @@ func InputOrder(c echo.Context) error {
 	harga_menu := c.FormValue("harga_menu")
 	tanggal_menu := c.FormValue("tanggal_menu")
 	tanggal_order := c.FormValue("tanggal_order")
+	alamat := c.FormValue("alamat")
 	longtitude := c.FormValue("longtitude")
 	langtitude := c.FormValue("langtitude")
 
 	long, _ := strconv.ParseFloat(longtitude, 64)
 	lang, _ := strconv.ParseFloat(langtitude, 64)
 
-	result, err := models.Input_Order(id_catering, id_user, id_menu, nama_menu, jumlah_menu, harga_menu, tanggal_menu, tanggal_order, lang, long, c.Response(), c.Request())
+	result, err := models.Input_Order(id_catering, id_user, id_menu, nama_menu, jumlah_menu, harga_menu, tanggal_menu, tanggal_order, alamat, lang, long, c.Response(), c.Request())
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

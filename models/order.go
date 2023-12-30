@@ -710,7 +710,7 @@ func Read_Order_Pengantar(id_pengantar string) (tools.Response, error) {
 		}
 
 		for rows2.Next() {
-			err = rows2.Scan(&obj_order_menu.Id_order, &obj_order_menu.Id_detail_order, &obj_order_menu.Id_catering, &obj_order_menu.Nama_catering, &obj_order_menu.Id_pengantar, &obj_order_menu.Nama_menu, &obj_order_menu.Harga_menu, &obj_order_menu.Status_order, &obj_order_menu.Radius, &obj_order_menu.Longtitude, &obj_order_menu.Langtitude)
+			err = rows2.Scan(&obj_order_menu.Id_order, &obj_order_menu.Id_detail_order, &obj_order_menu.Id_catering, &obj_order_menu.Nama_catering, &obj_order_menu.Id_pengantar, &obj_order_menu.Nama_menu, &obj_order_menu.Harga_menu, &obj_order_menu.Status_order, &obj_order_menu.Radius, &obj_order_menu.Longtitude, &obj_order_menu.Langtitude, &obj_order_menu.Alamat)
 
 			if err != nil {
 				return res, err

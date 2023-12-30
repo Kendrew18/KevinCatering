@@ -27,6 +27,7 @@ type Menu_Order_Dipesan struct {
 	Longtitude      float64 `json:"longtitude"`
 	Langtitude      float64 `json:"langtitude"`
 	Alamat          string  `json:"alamat"`
+	Nama_pemesan    string  `json:"nama_pemesan"`
 }
 
 type Read_Detail_Order_User struct {

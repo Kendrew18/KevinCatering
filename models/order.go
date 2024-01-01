@@ -699,7 +699,7 @@ func Read_Order_Pengantar(id_pengantar string) (tools.Response, error) {
 			return res, err
 		}
 
-		sqlStatement2 := "SELECT detail_order.id_order, id_detail_order, oc.id_catering,c.nama_catering,id_pengantar, nama_menu, harga_menu, status_order, radius, m.longtitude, m.langtitude,oc.alamat,u.nama FROM detail_order JOIN order_catering oc on detail_order.id_order = oc.id_order JOIN catering c on c.id_catering = oc.id_catering JOIN maps m on c.id_catering = m.id_catering join user u on oc.id_user = u.id_user WHERE detail_order.id_pengantar=? && tanggal_menu=? && status_order=?"
+		sqlStatement2 := "SELECT detail_order.id_order, id_detail_order, oc.id_catering,c.nama_catering,id_pengantar, nama_menu, harga_menu, status_order, radius, m.longtitude, m.langtitude,oc.alamat,u.nama, u.telp_user FROM detail_order JOIN order_catering oc on detail_order.id_order = oc.id_order JOIN catering c on c.id_catering = oc.id_catering JOIN maps m on c.id_catering = m.id_catering join user u on oc.id_user = u.id_user WHERE detail_order.id_pengantar=? && tanggal_menu=? && status_order=?"
 
 		rows2, err := con.Query(sqlStatement2, id_pengantar, obj_order_menu_fix.Tanggal_menu, "On Delivery")
 
@@ -710,7 +710,7 @@ func Read_Order_Pengantar(id_pengantar string) (tools.Response, error) {
 		}
 
 		for rows2.Next() {
-			err = rows2.Scan(&obj_order_menu.Id_order, &obj_order_menu.Id_detail_order, &obj_order_menu.Id_catering, &obj_order_menu.Nama_catering, &obj_order_menu.Id_pengantar, &obj_order_menu.Nama_menu, &obj_order_menu.Harga_menu, &obj_order_menu.Status_order, &obj_order_menu.Radius, &obj_order_menu.Longtitude, &obj_order_menu.Langtitude, &obj_order_menu.Alamat, &obj_order_menu.Nama_pemesan)
+			err = rows2.Scan(&obj_order_menu.Id_order, &obj_order_menu.Id_detail_order, &obj_order_menu.Id_catering, &obj_order_menu.Nama_catering, &obj_order_menu.Id_pengantar, &obj_order_menu.Nama_menu, &obj_order_menu.Harga_menu, &obj_order_menu.Status_order, &obj_order_menu.Radius, &obj_order_menu.Longtitude, &obj_order_menu.Langtitude, &obj_order_menu.Alamat, &obj_order_menu.Nama_pemesan, &obj_order_menu.Nomer_telp)
 
 			if err != nil {
 				return res, err
